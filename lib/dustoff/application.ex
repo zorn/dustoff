@@ -5,7 +5,7 @@ defmodule Dustoff.Application do
 
   use Application
 
-  @impl true
+  @impl Application
   def start(_type, _args) do
     children = [
       DustoffWeb.Telemetry,
@@ -26,7 +26,7 @@ defmodule Dustoff.Application do
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
-  @impl true
+  @impl Application
   def config_change(changed, _new, removed) do
     DustoffWeb.Endpoint.config_change(changed, removed)
     :ok

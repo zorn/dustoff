@@ -1,5 +1,5 @@
 defmodule DustoffWeb.PageControllerTest do
-  use DustoffWeb.ConnCase
+  use DustoffWeb.ConnCase, async: true
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")

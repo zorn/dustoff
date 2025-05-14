@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule DustoffWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
@@ -88,8 +89,8 @@ defmodule DustoffWeb do
       import DustoffWeb.CoreComponents
 
       # Common modules used in templates
-      alias Phoenix.LiveView.JS
       alias DustoffWeb.Layouts
+      alias Phoenix.LiveView.JS
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
