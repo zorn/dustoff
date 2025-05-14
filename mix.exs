@@ -35,6 +35,7 @@ defmodule Dustoff.MixProject do
     [
       # For code logic style and enforcement.
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
 
       # Uncategorized
       {:phoenix, "~> 1.8.0-rc.3", override: true},
