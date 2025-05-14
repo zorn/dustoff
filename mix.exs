@@ -33,6 +33,10 @@ defmodule Dustoff.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # For code logic style and enforcement.
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+
+      # Uncategorized
       {:phoenix, "~> 1.8.0-rc.3", override: true},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
