@@ -42,55 +42,6 @@ defmodule DustoffWeb.CoreComponents do
           optional(:inner_block) => term()
         }
 
-  @type button_assigns :: %{
-          :rest => map(),
-          optional(:variant) => String.t(),
-          :inner_block => term()
-        }
-
-  @type input_assigns :: %{
-          optional(:id) => any(),
-          optional(:name) => any(),
-          optional(:label) => String.t(),
-          optional(:value) => any(),
-          optional(:type) => String.t(),
-          optional(:field) => Phoenix.HTML.FormField.t(),
-          optional(:errors) => [String.t()],
-          optional(:checked) => boolean(),
-          optional(:prompt) => String.t(),
-          optional(:options) => list(),
-          optional(:multiple) => boolean(),
-          optional(:class) => String.t(),
-          optional(:error_class) => String.t(),
-          optional(:rest) => map()
-        }
-
-  @type header_assigns :: %{
-          optional(:class) => String.t(),
-          :inner_block => term(),
-          optional(:subtitle) => term(),
-          optional(:actions) => term()
-        }
-
-  @type table_assigns :: %{
-          :id => String.t(),
-          :rows => list() | term(),
-          optional(:row_id) => (any() -> String.t()),
-          optional(:row_click) => (any() -> any()),
-          optional(:row_item) => (any() -> any()),
-          :col => [%{label: String.t()}],
-          optional(:action) => [term()]
-        }
-
-  @type list_assigns :: %{
-          :item => [%{title: String.t()}]
-        }
-
-  @type icon_assigns :: %{
-          :name => String.t(),
-          optional(:class) => String.t()
-        }
-
   @doc """
   Renders flash notices.
 
@@ -140,6 +91,12 @@ defmodule DustoffWeb.CoreComponents do
     """
   end
 
+  @type button_assigns :: %{
+          :rest => map(),
+          optional(:variant) => String.t(),
+          :inner_block => term()
+        }
+
   @doc """
   Renders a button with navigation support.
 
@@ -172,6 +129,23 @@ defmodule DustoffWeb.CoreComponents do
       """
     end
   end
+
+  @type input_assigns :: %{
+          optional(:id) => any(),
+          optional(:name) => any(),
+          optional(:label) => String.t(),
+          optional(:value) => any(),
+          optional(:type) => String.t(),
+          optional(:field) => Phoenix.HTML.FormField.t(),
+          optional(:errors) => [String.t()],
+          optional(:checked) => boolean(),
+          optional(:prompt) => String.t(),
+          optional(:options) => list(),
+          optional(:multiple) => boolean(),
+          optional(:class) => String.t(),
+          optional(:error_class) => String.t(),
+          optional(:rest) => map()
+        }
 
   @doc """
   Renders an input with label and error messages.
@@ -337,6 +311,13 @@ defmodule DustoffWeb.CoreComponents do
     """
   end
 
+  @type header_assigns :: %{
+          optional(:class) => String.t(),
+          :inner_block => term(),
+          optional(:subtitle) => term(),
+          optional(:actions) => term()
+        }
+
   @doc """
   Renders a header with title.
   """
@@ -362,6 +343,16 @@ defmodule DustoffWeb.CoreComponents do
     </header>
     """
   end
+
+  @type table_assigns :: %{
+          :id => String.t(),
+          :rows => list() | term(),
+          optional(:row_id) => (any() -> String.t()),
+          optional(:row_click) => (any() -> any()),
+          optional(:row_item) => (any() -> any()),
+          :col => [%{label: String.t()}],
+          optional(:action) => [term()]
+        }
 
   @doc ~S"""
   Renders a table with generic styling.
@@ -427,6 +418,10 @@ defmodule DustoffWeb.CoreComponents do
     """
   end
 
+  @type list_assigns :: %{
+          :item => [%{title: String.t()}]
+        }
+
   @doc """
   Renders a data list.
 
@@ -454,6 +449,11 @@ defmodule DustoffWeb.CoreComponents do
     </ul>
     """
   end
+
+  @type icon_assigns :: %{
+          :name => String.t(),
+          optional(:class) => String.t()
+        }
 
   @doc """
   Renders a [Heroicon](https://heroicons.com).
