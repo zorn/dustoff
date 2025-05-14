@@ -30,6 +30,66 @@ defmodule DustoffWeb.CoreComponents do
   use Gettext, backend: DustoffWeb.Gettext
 
   alias Phoenix.LiveView.JS
+  alias Phoenix.LiveView.LiveStream
+  alias Phoenix.LiveView.Rendered
+
+  @type flash_assigns :: %{
+          optional(:id) => String.t(),
+          :flash => map(),
+          optional(:title) => String.t(),
+          :kind => :info | :error,
+          optional(:rest) => map(),
+          optional(:inner_block) => term()
+        }
+
+  @type button_assigns :: %{
+          :rest => map(),
+          optional(:variant) => String.t(),
+          :inner_block => term()
+        }
+
+  @type input_assigns :: %{
+          optional(:id) => any(),
+          optional(:name) => any(),
+          optional(:label) => String.t(),
+          optional(:value) => any(),
+          optional(:type) => String.t(),
+          optional(:field) => Phoenix.HTML.FormField.t(),
+          optional(:errors) => [String.t()],
+          optional(:checked) => boolean(),
+          optional(:prompt) => String.t(),
+          optional(:options) => list(),
+          optional(:multiple) => boolean(),
+          optional(:class) => String.t(),
+          optional(:error_class) => String.t(),
+          optional(:rest) => map()
+        }
+
+  @type header_assigns :: %{
+          optional(:class) => String.t(),
+          :inner_block => term(),
+          optional(:subtitle) => term(),
+          optional(:actions) => term()
+        }
+
+  @type table_assigns :: %{
+          :id => String.t(),
+          :rows => list() | term(),
+          optional(:row_id) => (any() -> String.t()),
+          optional(:row_click) => (any() -> any()),
+          optional(:row_item) => (any() -> any()),
+          :col => [%{label: String.t()}],
+          optional(:action) => [term()]
+        }
+
+  @type list_assigns :: %{
+          :item => [%{title: String.t()}]
+        }
+
+  @type icon_assigns :: %{
+          :name => String.t(),
+          optional(:class) => String.t()
+        }
 
   @doc """
   Renders flash notices.
@@ -39,6 +99,7 @@ defmodule DustoffWeb.CoreComponents do
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:info} phx-mounted={show("#flash")}>Welcome Back!</.flash>
   """
+  @spec flash(flash_assigns()) :: Rendered.t()
   attr :id, :string, doc: "the optional id of flash container"
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
   attr :title, :string, default: nil
@@ -88,6 +149,7 @@ defmodule DustoffWeb.CoreComponents do
       <.button phx-click="go" variant="primary">Send!</.button>
       <.button navigate={~p"/"}>Home</.button>
   """
+  @spec button(button_assigns()) :: Rendered.t()
   attr :rest, :global, include: ~w(href navigate patch method)
   attr :variant, :string, values: ~w(primary)
   slot :inner_block, required: true
@@ -137,6 +199,7 @@ defmodule DustoffWeb.CoreComponents do
       <.input field={@form[:email]} type="email" />
       <.input name="my-input" errors={["oh no!"]} />
   """
+  @spec input(input_assigns()) :: Rendered.t()
   attr :id, :any, default: nil
   attr :name, :any
   attr :label, :string, default: nil
@@ -277,6 +340,7 @@ defmodule DustoffWeb.CoreComponents do
   @doc """
   Renders a header with title.
   """
+  @spec header(header_assigns()) :: Rendered.t()
   attr :class, :string, default: nil
 
   slot :inner_block, required: true
@@ -309,6 +373,7 @@ defmodule DustoffWeb.CoreComponents do
         <:col :let={user} label="username">{user.username}</:col>
       </.table>
   """
+  @spec table(table_assigns()) :: Rendered.t()
   attr :id, :string, required: true
   attr :rows, :list, required: true
   attr :row_id, :any, default: nil, doc: "the function for generating the row id"
@@ -326,7 +391,7 @@ defmodule DustoffWeb.CoreComponents do
 
   def table(assigns) do
     assigns =
-      with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
+      with %{rows: %LiveStream{}} <- assigns do
         assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
       end
 
@@ -340,7 +405,7 @@ defmodule DustoffWeb.CoreComponents do
           </th>
         </tr>
       </thead>
-      <tbody id={@id} phx-update={is_struct(@rows, Phoenix.LiveView.LiveStream) && "stream"}>
+      <tbody id={@id} phx-update={is_struct(@rows, LiveStream) && "stream"}>
         <tr :for={row <- @rows} id={@row_id && @row_id.(row)}>
           <td
             :for={col <- @col}
@@ -372,6 +437,7 @@ defmodule DustoffWeb.CoreComponents do
         <:item title="Views">{@post.views}</:item>
       </.list>
   """
+  @spec list(list_assigns()) :: Rendered.t()
   slot :item, required: true do
     attr :title, :string, required: true
   end
@@ -407,6 +473,7 @@ defmodule DustoffWeb.CoreComponents do
       <.icon name="hero-x-mark" />
       <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
   """
+  @spec icon(icon_assigns()) :: Rendered.t()
   attr :name, :string, required: true
   attr :class, :string, default: "size-4"
 
@@ -418,6 +485,7 @@ defmodule DustoffWeb.CoreComponents do
 
   ## JS Commands
 
+  @spec show(JS.t() | nil, String.t()) :: JS.t()
   def show(js \\ %JS{}, selector) do
     JS.show(js,
       to: selector,
@@ -429,6 +497,7 @@ defmodule DustoffWeb.CoreComponents do
     )
   end
 
+  @spec hide(JS.t() | nil, String.t()) :: JS.t()
   def hide(js \\ %JS{}, selector) do
     JS.hide(js,
       to: selector,
@@ -442,6 +511,7 @@ defmodule DustoffWeb.CoreComponents do
   @doc """
   Translates an error message using gettext.
   """
+  @spec translate_error({String.t(), keyword()}) :: String.t()
   def translate_error({msg, opts}) do
     # When using gettext, we typically pass the strings we want
     # to translate as a static argument:
@@ -463,6 +533,7 @@ defmodule DustoffWeb.CoreComponents do
   @doc """
   Translates the errors for a field from a keyword list of errors.
   """
+  @spec translate_errors([{atom(), {String.t(), keyword()}}], atom()) :: [String.t()]
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
