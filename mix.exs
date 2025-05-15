@@ -88,7 +88,8 @@ defmodule Dustoff.MixProject do
         "tailwind dustoff --minify",
         "esbuild dustoff --minify",
         "phx.digest"
-      ]
+      ],
+      check: ["credo --strict", "dialyzer", "sobelow"]
     ]
   end
 end
