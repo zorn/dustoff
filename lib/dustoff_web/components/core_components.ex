@@ -30,17 +30,7 @@ defmodule DustoffWeb.CoreComponents do
   use Gettext, backend: DustoffWeb.Gettext
 
   alias Phoenix.LiveView.JS
-  alias Phoenix.LiveView.LiveStream
   alias Phoenix.LiveView.Rendered
-
-  @type flash_assigns :: %{
-          optional(:id) => String.t(),
-          :flash => map(),
-          optional(:title) => String.t(),
-          :kind => :info | :error,
-          optional(:rest) => map(),
-          optional(:inner_block) => term()
-        }
 
   @doc """
   Renders flash notices.
@@ -50,7 +40,6 @@ defmodule DustoffWeb.CoreComponents do
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:info} phx-mounted={show("#flash")}>Welcome Back!</.flash>
   """
-  @spec flash(flash_assigns()) :: Rendered.t()
   attr :id, :string, doc: "the optional id of flash container"
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
   attr :title, :string, default: nil
@@ -59,6 +48,7 @@ defmodule DustoffWeb.CoreComponents do
 
   slot :inner_block, doc: "the optional inner block that renders the flash message"
 
+  @spec flash(assigns :: map()) :: Rendered.t()
   def flash(assigns) do
     assigns = assign_new(assigns, :id, fn -> "flash-#{assigns.kind}" end)
 
@@ -91,12 +81,6 @@ defmodule DustoffWeb.CoreComponents do
     """
   end
 
-  @type button_assigns :: %{
-          :rest => map(),
-          optional(:variant) => String.t(),
-          :inner_block => term()
-        }
-
   @doc """
   Renders a button with navigation support.
 
@@ -106,11 +90,11 @@ defmodule DustoffWeb.CoreComponents do
       <.button phx-click="go" variant="primary">Send!</.button>
       <.button navigate={~p"/"}>Home</.button>
   """
-  @spec button(button_assigns()) :: Rendered.t()
   attr :rest, :global, include: ~w(href navigate patch method)
   attr :variant, :string, values: ~w(primary)
   slot :inner_block, required: true
 
+  @spec button(assigns :: map()) :: Rendered.t()
   def button(%{rest: rest} = assigns) do
     variants = %{"primary" => "btn-primary", nil => "btn-primary btn-soft"}
     assigns = assign(assigns, :class, Map.fetch!(variants, assigns[:variant]))
@@ -129,23 +113,6 @@ defmodule DustoffWeb.CoreComponents do
       """
     end
   end
-
-  @type input_assigns :: %{
-          optional(:id) => any(),
-          optional(:name) => any(),
-          optional(:label) => String.t(),
-          optional(:value) => any(),
-          optional(:type) => String.t(),
-          optional(:field) => Phoenix.HTML.FormField.t(),
-          optional(:errors) => [String.t()],
-          optional(:checked) => boolean(),
-          optional(:prompt) => String.t(),
-          optional(:options) => list(),
-          optional(:multiple) => boolean(),
-          optional(:class) => String.t(),
-          optional(:error_class) => String.t(),
-          optional(:rest) => map()
-        }
 
   @doc """
   Renders an input with label and error messages.
@@ -173,7 +140,6 @@ defmodule DustoffWeb.CoreComponents do
       <.input field={@form[:email]} type="email" />
       <.input name="my-input" errors={["oh no!"]} />
   """
-  @spec input(input_assigns()) :: Rendered.t()
   attr :id, :any, default: nil
   attr :name, :any
   attr :label, :string, default: nil
@@ -199,6 +165,7 @@ defmodule DustoffWeb.CoreComponents do
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                 multiple pattern placeholder readonly required rows size step)
 
+  @spec input(assigns :: map()) :: Rendered.t()
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
 
@@ -311,23 +278,16 @@ defmodule DustoffWeb.CoreComponents do
     """
   end
 
-  @type header_assigns :: %{
-          optional(:class) => String.t(),
-          :inner_block => term(),
-          optional(:subtitle) => term(),
-          optional(:actions) => term()
-        }
-
   @doc """
   Renders a header with title.
   """
-  @spec header(header_assigns()) :: Rendered.t()
   attr :class, :string, default: nil
 
   slot :inner_block, required: true
   slot :subtitle
   slot :actions
 
+  @spec header(assigns :: map()) :: Rendered.t()
   def header(assigns) do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", "pb-4", @class]}>
@@ -344,16 +304,6 @@ defmodule DustoffWeb.CoreComponents do
     """
   end
 
-  @type table_assigns :: %{
-          :id => String.t(),
-          :rows => list() | term(),
-          optional(:row_id) => (any() -> String.t()),
-          optional(:row_click) => (any() -> any()),
-          optional(:row_item) => (any() -> any()),
-          :col => [%{label: String.t()}],
-          optional(:action) => [term()]
-        }
-
   @doc ~S"""
   Renders a table with generic styling.
 
@@ -364,7 +314,6 @@ defmodule DustoffWeb.CoreComponents do
         <:col :let={user} label="username">{user.username}</:col>
       </.table>
   """
-  @spec table(table_assigns()) :: Rendered.t()
   attr :id, :string, required: true
   attr :rows, :list, required: true
   attr :row_id, :any, default: nil, doc: "the function for generating the row id"
@@ -380,9 +329,10 @@ defmodule DustoffWeb.CoreComponents do
 
   slot :action, doc: "the slot for showing user actions in the last table column"
 
+  @spec table(assigns :: map()) :: Rendered.t()
   def table(assigns) do
     assigns =
-      with %{rows: %LiveStream{}} <- assigns do
+      with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
         assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
       end
 
@@ -396,7 +346,7 @@ defmodule DustoffWeb.CoreComponents do
           </th>
         </tr>
       </thead>
-      <tbody id={@id} phx-update={is_struct(@rows, LiveStream) && "stream"}>
+      <tbody id={@id} phx-update={is_struct(@rows, Phoenix.LiveView.LiveStream) && "stream"}>
         <tr :for={row <- @rows} id={@row_id && @row_id.(row)}>
           <td
             :for={col <- @col}
@@ -418,10 +368,6 @@ defmodule DustoffWeb.CoreComponents do
     """
   end
 
-  @type list_assigns :: %{
-          :item => [%{title: String.t()}]
-        }
-
   @doc """
   Renders a data list.
 
@@ -432,11 +378,11 @@ defmodule DustoffWeb.CoreComponents do
         <:item title="Views">{@post.views}</:item>
       </.list>
   """
-  @spec list(list_assigns()) :: Rendered.t()
   slot :item, required: true do
     attr :title, :string, required: true
   end
 
+  @spec list(assigns :: map()) :: Rendered.t()
   def list(assigns) do
     ~H"""
     <ul class="list">
@@ -449,11 +395,6 @@ defmodule DustoffWeb.CoreComponents do
     </ul>
     """
   end
-
-  @type icon_assigns :: %{
-          :name => String.t(),
-          optional(:class) => String.t()
-        }
 
   @doc """
   Renders a [Heroicon](https://heroicons.com).
@@ -473,10 +414,10 @@ defmodule DustoffWeb.CoreComponents do
       <.icon name="hero-x-mark" />
       <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
   """
-  @spec icon(icon_assigns()) :: Rendered.t()
   attr :name, :string, required: true
   attr :class, :string, default: "size-4"
 
+  @spec icon(assigns :: map()) :: Rendered.t()
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
     <span class={[@name, @class]} />
@@ -484,8 +425,7 @@ defmodule DustoffWeb.CoreComponents do
   end
 
   ## JS Commands
-
-  @spec show(JS.t() | nil, String.t()) :: JS.t()
+  @spec show(JS.t(), String.t()) :: JS.t()
   def show(js \\ %JS{}, selector) do
     JS.show(js,
       to: selector,
@@ -497,7 +437,7 @@ defmodule DustoffWeb.CoreComponents do
     )
   end
 
-  @spec hide(JS.t() | nil, String.t()) :: JS.t()
+  @spec hide(JS.t(), String.t()) :: JS.t()
   def hide(js \\ %JS{}, selector) do
     JS.hide(js,
       to: selector,
@@ -511,7 +451,7 @@ defmodule DustoffWeb.CoreComponents do
   @doc """
   Translates an error message using gettext.
   """
-  @spec translate_error({String.t(), keyword()}) :: String.t()
+  @spec translate_error({String.t(), Keyword.t()}) :: String.t()
   def translate_error({msg, opts}) do
     # When using gettext, we typically pass the strings we want
     # to translate as a static argument:
@@ -533,7 +473,7 @@ defmodule DustoffWeb.CoreComponents do
   @doc """
   Translates the errors for a field from a keyword list of errors.
   """
-  @spec translate_errors([{atom(), {String.t(), keyword()}}], atom()) :: [String.t()]
+  @spec translate_errors(list(), String.t()) :: list(String.t())
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
