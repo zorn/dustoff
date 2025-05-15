@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule DustoffWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
@@ -17,8 +18,10 @@ defmodule DustoffWeb do
   those modules here.
   """
 
+  @spec static_paths() :: [String.t()]
   def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
 
+  @spec router() :: Macro.t()
   def router do
     quote do
       use Phoenix.Router, helpers: false
@@ -30,12 +33,14 @@ defmodule DustoffWeb do
     end
   end
 
+  @spec channel() :: Macro.t()
   def channel do
     quote do
       use Phoenix.Channel
     end
   end
 
+  @spec controller() :: Macro.t()
   def controller do
     quote do
       use Phoenix.Controller, formats: [:html, :json]
@@ -48,6 +53,7 @@ defmodule DustoffWeb do
     end
   end
 
+  @spec live_view() :: Macro.t()
   def live_view do
     quote do
       use Phoenix.LiveView
@@ -56,6 +62,7 @@ defmodule DustoffWeb do
     end
   end
 
+  @spec live_component() :: Macro.t()
   def live_component do
     quote do
       use Phoenix.LiveComponent
@@ -64,6 +71,7 @@ defmodule DustoffWeb do
     end
   end
 
+  @spec html() :: Macro.t()
   def html do
     quote do
       use Phoenix.Component
@@ -77,6 +85,7 @@ defmodule DustoffWeb do
     end
   end
 
+  @spec html_helpers() :: Macro.t()
   defp html_helpers do
     quote do
       # Translation
@@ -88,14 +97,15 @@ defmodule DustoffWeb do
       import DustoffWeb.CoreComponents
 
       # Common modules used in templates
-      alias Phoenix.LiveView.JS
       alias DustoffWeb.Layouts
+      alias Phoenix.LiveView.JS
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
     end
   end
 
+  @spec verified_routes() :: Macro.t()
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
@@ -108,6 +118,7 @@ defmodule DustoffWeb do
   @doc """
   When used, dispatch to the appropriate controller/live_view/etc.
   """
+  @spec __using__(atom()) :: Macro.t()
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
   end
