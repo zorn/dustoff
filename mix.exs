@@ -37,6 +37,9 @@ defmodule Dustoff.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
 
+      # For security scans.
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+
       # Uncategorized
       {:phoenix, "~> 1.8.0-rc.3", override: true},
       {:phoenix_ecto, "~> 4.5"},
