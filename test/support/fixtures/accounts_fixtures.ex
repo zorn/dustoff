@@ -14,7 +14,9 @@ defmodule Dustoff.AccountsFixtures do
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
-      email: unique_user_email()
+      email: unique_user_email(),
+      password: "some-good-test-password",
+      password_confirmation: "some-good-test-password"
     })
   end
 
