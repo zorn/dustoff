@@ -12,8 +12,8 @@ defmodule Dustoff.AccountsTest do
     end
 
     test "returns the user if the email exists" do
-      %{id: id} = user = user_fixture()
-      assert %User{id: ^id} = Accounts.get_user_by_email(user.email)
+      %{id: id, email: email} = user_fixture()
+      assert %User{id: ^id, email: ^email} = Accounts.get_user_by_email(email)
     end
   end
 
@@ -23,15 +23,18 @@ defmodule Dustoff.AccountsTest do
     end
 
     test "does not return the user if the password is not valid" do
-      user = user_fixture() |> set_password()
+      user = user_fixture(%{password: "apple-banana-cherry"})
       refute Accounts.get_user_by_email_and_password(user.email, "invalid")
     end
 
     test "returns the user if the email and password are valid" do
-      %{id: id} = user = user_fixture() |> set_password()
+      %{id: id} = user = user_fixture(%{password: "apple-banana-cherry"})
 
       assert %User{id: ^id} =
-               Accounts.get_user_by_email_and_password(user.email, valid_user_password())
+               Accounts.get_user_by_email_and_password(
+                 user.email,
+                 "apple-banana-cherry"
+               )
     end
   end
 
@@ -51,7 +54,6 @@ defmodule Dustoff.AccountsTest do
   describe "register_user/1" do
     test "requires email to be set" do
       {:error, changeset} = Accounts.register_user(%{})
-
       assert %{email: ["can't be blank"]} = errors_on(changeset)
     end
 
@@ -77,32 +79,51 @@ defmodule Dustoff.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
-    test "registers users without password" do
-      email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
-      assert user.email == email
-      assert is_nil(user.hashed_password)
-      assert is_nil(user.confirmed_at)
-      assert is_nil(user.password)
+    test "requires password to be set" do
+      {:error, changeset} = Accounts.register_user(%{email: "user@example.com"})
+      assert %{password: ["can't be blank"]} = errors_on(changeset)
+    end
+
+    test "requires password confirmation to match" do
+      {:error, changeset} =
+        Accounts.register_user(%{
+          email: "user@example.com",
+          password: "apple-banana-cherry",
+          password_confirmation: "apple-banana-cherry-orange"
+        })
+
+      assert %{password_confirmation: ["does not match password"]} = errors_on(changeset)
     end
   end
 
-  describe "sudo_mode?/2" do
-    test "validates the authenticated_at time" do
+  describe "recently_authenticated?/2" do
+    test "validates the `authenticated_at` time" do
       now = DateTime.utc_now()
 
-      assert Accounts.sudo_mode?(%User{authenticated_at: DateTime.utc_now()})
-      assert Accounts.sudo_mode?(%User{authenticated_at: DateTime.add(now, -19, :minute)})
-      refute Accounts.sudo_mode?(%User{authenticated_at: DateTime.add(now, -21, :minute)})
+      assert Accounts.recently_authenticated?(%User{authenticated_at: DateTime.utc_now()})
+
+      assert Accounts.recently_authenticated?(%User{
+               authenticated_at: DateTime.add(now, -19, :minute)
+             })
+
+      refute Accounts.recently_authenticated?(%User{
+               authenticated_at: DateTime.add(now, -21, :minute)
+             })
 
       # minute override
-      refute Accounts.sudo_mode?(
+      refute Accounts.recently_authenticated?(
                %User{authenticated_at: DateTime.add(now, -11, :minute)},
                -10
              )
 
       # not authenticated
-      refute Accounts.sudo_mode?(%User{})
+      refute Accounts.recently_authenticated?(%User{})
+    end
+  end
+
+  describe "registration_changeset/2" do
+    test "returns a user changeset" do
+      assert %Ecto.Changeset{} = changeset = Accounts.registration_changeset()
     end
   end
 

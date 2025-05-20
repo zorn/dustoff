@@ -64,15 +64,6 @@ defmodule Dustoff.Accounts do
 
   @doc """
   Registers a user.
-
-  ## Examples
-
-      iex> register_user(%{field: value})
-      {:ok, %User{}}
-
-      iex> register_user(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
   def register_user(attrs) do
     attrs
@@ -83,19 +74,28 @@ defmodule Dustoff.Accounts do
   ## Settings
 
   @doc """
-  Checks whether the user is in sudo mode.
+  Returns `true` when the user recently authenticated.
 
-  The user is in sudo mode when the last authentication was done no further
-  than 20 minutes ago. The limit can be given as second argument in minutes.
+  Recently is defined by default as the last authentication was done no further
+  than 20 minutes ago.
+
+  The time limit in minutes can be given as second argument in minutes.
   """
-  def sudo_mode?(user, minutes \\ -20)
+  def recently_authenticated?(user, minutes \\ -20)
 
-  def sudo_mode?(%User{authenticated_at: ts}, minutes) when is_struct(ts, DateTime) do
-    DateTime.after?(ts, DateTime.utc_now() |> DateTime.add(minutes, :minute))
+  def recently_authenticated?(%User{authenticated_at: authenticated_at}, minutes)
+      when is_struct(authenticated_at, DateTime) do
+    minutes_from_now = DateTime.utc_now() |> DateTime.add(minutes, :minute)
+    DateTime.after?(authenticated_at, minutes_from_now)
   end
 
-  def sudo_mode?(_user, _minutes), do: false
+  def recently_authenticated?(_user, _minutes) do
+    # If the previous pattern match failed, it was likely due to the user not
+    # having an `authenticated_at` field value, as in they have never authenticated.
+    false
+  end
 
+  # TODO: Add docs and specs.
   def registration_changeset(attrs \\ %{}, opts \\ []) when is_map(attrs) and is_list(opts) do
     User.registration_changeset(attrs, opts)
   end
