@@ -9,7 +9,7 @@ defmodule Dustoff.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Dustoff", "contact@example.com"})
+      |> from({"Dustoff Admin Mike Zornek", "mike@mikezornek.com"})
       |> subject(subject)
       |> text_body(body)
 
