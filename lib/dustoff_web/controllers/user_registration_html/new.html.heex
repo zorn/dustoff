@@ -20,6 +20,20 @@
         required
         phx-mounted={JS.focus()}
       />
+      <.input
+        field={f[:password]}
+        type="password"
+        label="Password"
+        autocomplete="new-password"
+        required
+      />
+      <.input
+        field={f[:password_confirmation]}
+        type="password"
+        label="Confirm password"
+        autocomplete="new-password"
+        required
+      />
 
       <.button variant="primary" phx-disable-with="Creating account..." class="w-full">
         Create an account
