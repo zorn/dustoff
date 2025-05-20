@@ -14,7 +14,32 @@ defmodule Dustoff.Accounts.User do
   end
 
   @doc """
-  A user changeset for registering or changing the email.
+  A user changeset for registering a new account using the provided email and password.
+
+  ## Options
+
+    * `:validate_email` - Set to false if you don't want to validate the
+      uniqueness of the email, useful when displaying live validations.
+      Defaults to `true`.
+      * `:hash_password` - Hashes the password so it can be stored securely
+      in the database and ensures the password field is cleared to prevent
+      leaks in the logs. If password hashing is not needed and clearing the
+      password field is not desired (like when using this changeset for
+      validations on a LiveView form), this option can be set to `false`.
+      Defaults to `true`.
+  """
+  def registration_changeset(attrs, opts \\ []) do
+    %__MODULE__{}
+    |> cast(attrs, [:email, :password])
+    |> validate_required([:email, :password])
+    |> validate_email(opts)
+    # Q: Why not do the confirmation in the `validate_password` function?
+    |> validate_confirmation(:password, message: "does not match password")
+    |> validate_password(opts)
+  end
+
+  @doc """
+  A user changeset changing the email.
 
   It requires the email to change otherwise an error is added.
 

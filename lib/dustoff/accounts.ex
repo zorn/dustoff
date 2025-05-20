@@ -75,8 +75,8 @@ defmodule Dustoff.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> User.email_changeset(attrs)
+    attrs
+    |> User.registration_changeset()
     |> Repo.insert()
   end
 
@@ -95,6 +95,10 @@ defmodule Dustoff.Accounts do
   end
 
   def sudo_mode?(_user, _minutes), do: false
+
+  def registration_changeset(attrs \\ %{}, opts \\ []) when is_map(attrs) and is_list(opts) do
+    User.registration_changeset(attrs, opts)
+  end
 
   @doc """
   Returns an `%Ecto.Changeset{}` for changing the user email.
