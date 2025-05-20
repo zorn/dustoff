@@ -33,7 +33,12 @@ defmodule Dustoff.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # For TDD.
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
+
+      # For password hashing.
       {:argon2_elixir, "~> 4.0"},
+
       # For code logic style and enforcement.
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
