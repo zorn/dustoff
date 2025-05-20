@@ -1,5 +1,15 @@
 # Command Line History
 
+## May 20, 2025
+
+<https://hexdocs.pm/phoenix/mix_phx_gen_auth.html>
+
+We will prefer `argon2` for our hashing.
+
+```bash
+mix phx.gen.auth Accounts User users --hashing-lib argon2
+```
+
 ## May 14, 2025
 
 The project was created with a pre-release version of the Phoenix project template. To install that we used:

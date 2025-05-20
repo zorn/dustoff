@@ -58,6 +58,8 @@ defmodule DustoffWeb do
     quote do
       use Phoenix.LiveView
 
+      import DustoffWeb.LiveViewPipes
+
       unquote(html_helpers())
     end
   end
