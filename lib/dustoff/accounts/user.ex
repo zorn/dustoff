@@ -25,7 +25,35 @@ defmodule Dustoff.Accounts.User do
   end
 
   @doc """
-  A user changeset for registering or changing the email.
+  A user changeset for registering a new user account.
+
+  ## Options
+
+    * `:validate_email` - Set to false if you don't want to validate the
+      uniqueness of the email, useful when displaying live validations. Defaults
+      to `true`.
+    * `:hash_password` - Hashes the password so it can be stored securely in the
+      database and ensures the password field is cleared to prevent leaks in the
+      logs. If password hashing is not needed and clearing the password field is
+      not desired (like when using this changeset for validations on a LiveView
+      form), this option can be set to `false`. Defaults to `true`.
+
+
+  """
+  # TODO: Improve spec
+  @spec registration_changeset(Ecto.Schema.t(), map(), Keyword.t()) :: Ecto.Changeset.t()
+  def registration_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_required([:email, :password])
+    |> validate_email(opts)
+    # Not sure why this `_confirmation` is not in the general `validate_password/2` function.
+    |> validate_confirmation(:password, message: "does not match password")
+    |> validate_password(opts)
+  end
+
+  @doc """
+  A user changeset for changing the email.
 
   It requires the email to change otherwise an error is added.
 
@@ -102,6 +130,7 @@ defmodule Dustoff.Accounts.User do
   end
 
   defp maybe_hash_password(changeset, opts) do
+    # TODO: Update to validate!
     hash_password? = Keyword.get(opts, :hash_password, true)
     password = get_change(changeset, :password)
 
