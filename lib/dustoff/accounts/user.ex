@@ -1,6 +1,17 @@
 defmodule Dustoff.Accounts.User do
+  @moduledoc """
+  TBD
+  """
+
+  # TODO:Fill this out
+  @type t() :: %__MODULE__{}
+
+  @type id() :: Ecto.UUID.t()
+
   use Ecto.Schema
+
   import Ecto.Changeset
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do

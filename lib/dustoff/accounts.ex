@@ -1,43 +1,28 @@
 defmodule Dustoff.Accounts do
   @moduledoc """
-  The Accounts context.
+  Provides functions for managing user accounts, authentication and sessions.
   """
 
-  import Ecto.Query, warn: false
+  alias Dustoff.Accounts.User
+  alias Dustoff.Accounts.UserNotifier
+  alias Dustoff.Accounts.UserToken
   alias Dustoff.Repo
 
-  alias Dustoff.Accounts.{User, UserToken, UserNotifier}
-
-  ## Database getters
-
   @doc """
-  Gets a user by email.
-
-  ## Examples
-
-      iex> get_user_by_email("foo@example.com")
-      %User{}
-
-      iex> get_user_by_email("unknown@example.com")
-      nil
-
+  Gets a `Dustoff.Accounts.User` entity by email.
   """
+  @spec get_user_by_email(String.t()) :: User.t() | nil
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end
 
   @doc """
-  Gets a user by email and password.
-
-  ## Examples
-
-      iex> get_user_by_email_and_password("foo@example.com", "correct_password")
-      %User{}
-
-      iex> get_user_by_email_and_password("foo@example.com", "invalid_password")
-      nil
-
+  Gets a `Dustoff.Accounts.User` entity by email and password.
   """
+  @spec get_user_by_email_and_password(
+          email :: String.t(),
+          password :: String.t()
+        ) :: User.t() | nil
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
     user = Repo.get_by(User, email: email)
@@ -45,48 +30,32 @@ defmodule Dustoff.Accounts do
   end
 
   @doc """
-  Gets a single user.
+  Gets a single `Dustoff.Accounts.User` entity.
 
   Raises `Ecto.NoResultsError` if the User does not exist.
-
-  ## Examples
-
-      iex> get_user!(123)
-      %User{}
-
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
-
   """
+  @spec get_user!(User.id()) :: User.t()
   def get_user!(id), do: Repo.get!(User, id)
 
-  ## User registration
-
   @doc """
-  Registers a user.
+  Registers a new user.
 
-  ## Examples
-
-      iex> register_user(%{field: value})
-      {:ok, %User{}}
-
-      iex> register_user(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
+  TODO: I think I'll be able to delete this. I wonder why if email is the only attribute they accept a `map()`.
   """
+  @spec register_user(map()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_user(attrs) do
     %User{}
     |> User.email_changeset(attrs)
     |> Repo.insert()
   end
 
-  ## Settings
-
   @doc """
   Checks whether the user is in sudo mode.
 
   The user is in sudo mode when the last authentication was done no further
   than 20 minutes ago. The limit can be given as second argument in minutes.
+
+  TODO: I think `sudo` is a poor name choice here. This has nothing to do with elevated privileges or a different role. It's just about if their auth was recent.
   """
   def sudo_mode?(user, minutes \\ -20)
 
@@ -101,10 +70,7 @@ defmodule Dustoff.Accounts do
 
   See `Dustoff.Accounts.User.email_changeset/3` for a list of supported options.
 
-  ## Examples
-
-      iex> change_user_email(user)
-      %Ecto.Changeset{data: %User{}}
+  TODO: What are the opts here?
 
   """
   def change_user_email(user, attrs \\ %{}, opts \\ []) do
@@ -174,8 +140,6 @@ defmodule Dustoff.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
-
-  ## Session
 
   @doc """
   Generates a session token.
