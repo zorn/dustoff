@@ -1,4 +1,10 @@
 defmodule Dustoff.Accounts.User do
+  @moduledoc """
+  TBD
+
+  Maybe document what each field is used for.
+  """
+
   use Ecto.Schema
 
   import Ecto.Changeset
