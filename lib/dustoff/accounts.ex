@@ -1,43 +1,28 @@
 defmodule Dustoff.Accounts do
   @moduledoc """
-  The Accounts context.
+  Provides functions for managing user accounts, authentication and sessions.
   """
 
-  import Ecto.Query, warn: false
+  alias Dustoff.Accounts.User
+  alias Dustoff.Accounts.UserNotifier
+  alias Dustoff.Accounts.UserToken
   alias Dustoff.Repo
 
-  alias Dustoff.Accounts.{User, UserToken, UserNotifier}
-
-  ## Database getters
-
   @doc """
-  Gets a user by email.
-
-  ## Examples
-
-      iex> get_user_by_email("foo@example.com")
-      %User{}
-
-      iex> get_user_by_email("unknown@example.com")
-      nil
-
+  Gets a `Dustoff.Accounts.User` entity by email.
   """
+  @spec get_user_by_email(email :: String.t()) :: User.t() | nil
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end
 
   @doc """
-  Gets a user by email and password.
-
-  ## Examples
-
-      iex> get_user_by_email_and_password("foo@example.com", "correct_password")
-      %User{}
-
-      iex> get_user_by_email_and_password("foo@example.com", "invalid_password")
-      nil
-
+  Gets a `Dustoff.Accounts.User` entity by email and password.
   """
+  @spec get_user_by_email_and_password(
+          email :: String.t(),
+          password :: String.t()
+        ) :: User.t() | nil
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
     user = Repo.get_by(User, email: email)
@@ -45,19 +30,11 @@ defmodule Dustoff.Accounts do
   end
 
   @doc """
-  Gets a single user.
+  Gets a single `Dustoff.Accounts.User` entity.
 
   Raises `Ecto.NoResultsError` if the User does not exist.
-
-  ## Examples
-
-      iex> get_user!(123)
-      %User{}
-
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
-
   """
+  @spec get_user!(User.id()) :: User.t()
   def get_user!(id), do: Repo.get!(User, id)
 
   ## User registration
@@ -65,6 +42,7 @@ defmodule Dustoff.Accounts do
   @doc """
   Registers a user.
   """
+  @spec register_user(attrs :: map()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_user(attrs) do
     attrs
     |> User.registration_changeset()
@@ -74,13 +52,14 @@ defmodule Dustoff.Accounts do
   ## Settings
 
   @doc """
-  Returns `true` when the user recently authenticated.
+  Returns `true` when the user is considered recently authenticated.
 
   Recently is defined by default as the last authentication was done no further
   than 20 minutes ago.
 
   The time limit in minutes can be given as second argument in minutes.
   """
+  @spec recently_authenticated?(User.t(), minutes :: integer()) :: boolean()
   def recently_authenticated?(user, minutes \\ -20)
 
   def recently_authenticated?(%User{authenticated_at: authenticated_at}, minutes)
@@ -95,7 +74,12 @@ defmodule Dustoff.Accounts do
     false
   end
 
-  # TODO: Add docs and specs.
+  @doc """
+  Returns an `%Ecto.Changeset{}` for registering a new account.
+
+  See `Dustoff.Accounts.User.registration_changeset/2` for a list of supported options.
+  """
+  @spec registration_changeset(attrs :: map(), opts :: keyword()) :: Ecto.Changeset.t()
   def registration_changeset(attrs \\ %{}, opts \\ []) when is_map(attrs) and is_list(opts) do
     User.registration_changeset(attrs, opts)
   end
@@ -104,14 +88,14 @@ defmodule Dustoff.Accounts do
   Returns an `%Ecto.Changeset{}` for changing the user email.
 
   See `Dustoff.Accounts.User.email_changeset/3` for a list of supported options.
-
-  ## Examples
-
-      iex> change_user_email(user)
-      %Ecto.Changeset{data: %User{}}
-
   """
-  def change_user_email(user, attrs \\ %{}, opts \\ []) do
+  @spec change_user_email(
+          user :: User.t(),
+          attrs :: map(),
+          opts :: keyword()
+        ) :: User.changeset()
+  def change_user_email(user, attrs \\ %{}, opts \\ [])
+      when is_struct(user, User) and is_map(attrs) and is_list(opts) do
     User.email_changeset(user, attrs, opts)
   end
 
@@ -120,6 +104,7 @@ defmodule Dustoff.Accounts do
 
   If the token matches, the user email is updated and the token is deleted.
   """
+  @spec update_user_email(User.t(), token :: String.t()) :: :ok | :error
   def update_user_email(user, token) do
     context = "change:#{user.email}"
 
@@ -132,6 +117,11 @@ defmodule Dustoff.Accounts do
     end
   end
 
+  @spec user_email_multi(
+          user :: User.t(),
+          email :: String.t(),
+          context :: String.t()
+        ) :: Ecto.Multi.t()
   defp user_email_multi(user, email, context) do
     changeset = User.email_changeset(user, %{email: email})
 
@@ -144,13 +134,12 @@ defmodule Dustoff.Accounts do
   Returns an `%Ecto.Changeset{}` for changing the user password.
 
   See `Dustoff.Accounts.User.password_changeset/3` for a list of supported options.
-
-  ## Examples
-
-      iex> change_user_password(user)
-      %Ecto.Changeset{data: %User{}}
-
   """
+  @spec change_user_password(
+          user :: User.t(),
+          attrs :: map(),
+          opts :: keyword()
+        ) :: User.changeset()
   def change_user_password(user, attrs \\ %{}, opts \\ []) do
     User.password_changeset(user, attrs, opts)
   end
@@ -159,16 +148,9 @@ defmodule Dustoff.Accounts do
   Updates the user password.
 
   Returns the updated user, as well as a list of expired tokens.
-
-  ## Examples
-
-      iex> update_user_password(user, %{password: ...})
-      {:ok, %User{}, [...]}
-
-      iex> update_user_password(user, %{password: "too short"})
-      {:error, %Ecto.Changeset{}}
-
   """
+  @spec update_user_password(user :: User.t(), attrs :: map()) ::
+          {:ok, User.t(), [UserToken.t()]} | {:error, User.changeset()}
   def update_user_password(user, attrs) do
     user
     |> User.password_changeset(attrs)
@@ -179,11 +161,10 @@ defmodule Dustoff.Accounts do
     end
   end
 
-  ## Session
-
   @doc """
-  Generates a session token.
+  Generates and persists a session token.
   """
+  @spec generate_user_session_token(user :: User.t()) :: token :: String.t()
   def generate_user_session_token(user) do
     {token, user_token} = UserToken.build_session_token(user)
     Repo.insert!(user_token)
@@ -191,81 +172,19 @@ defmodule Dustoff.Accounts do
   end
 
   @doc """
-  Gets the user with the given signed token.
+  Gets a `Dustoff.Accounts.User` entity with the given signed token.
 
   If the token is valid `{user, token_inserted_at}` is returned, otherwise `nil` is returned.
   """
+  @spec get_user_by_session_token(token :: String.t()) ::
+          {User.t(), token_inserted_at :: DateTime.t()} | nil
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
     Repo.one(query)
   end
 
   @doc """
-  Gets the user with the given magic link token.
-  """
-  def get_user_by_magic_link_token(token) do
-    with {:ok, query} <- UserToken.verify_magic_link_token_query(token),
-         {user, _token} <- Repo.one(query) do
-      user
-    else
-      _ -> nil
-    end
-  end
-
-  @doc """
-  Logs the user in by magic link.
-
-  There are three cases to consider:
-
-  1. The user has already confirmed their email. They are logged in
-     and the magic link is expired.
-
-  2. The user has not confirmed their email and no password is set.
-     In this case, the user gets confirmed, logged in, and all tokens -
-     including session ones - are expired. In theory, no other tokens
-     exist but we delete all of them for best security practices.
-
-  3. The user has not confirmed their email but a password is set.
-     This cannot happen in the default implementation but may be the
-     source of security pitfalls. See the "Mixing magic link and password registration" section of
-     `mix help phx.gen.auth`.
-  """
-  def login_user_by_magic_link(token) do
-    {:ok, query} = UserToken.verify_magic_link_token_query(token)
-
-    case Repo.one(query) do
-      # Prevent session fixation attacks by disallowing magic links for unconfirmed users with password
-      {%User{confirmed_at: nil, hashed_password: hash}, _token} when not is_nil(hash) ->
-        raise """
-        magic link log in is not allowed for unconfirmed users with a password set!
-
-        This cannot happen with the default implementation, which indicates that you
-        might have adapted the code to a different use case. Please make sure to read the
-        "Mixing magic link and password registration" section of `mix help phx.gen.auth`.
-        """
-
-      {%User{confirmed_at: nil} = user, _token} ->
-        user
-        |> User.confirm_changeset()
-        |> update_user_and_delete_all_tokens()
-
-      {user, token} ->
-        Repo.delete!(token)
-        {:ok, user, []}
-
-      nil ->
-        {:error, :not_found}
-    end
-  end
-
-  @doc ~S"""
   Delivers the update email instructions to the given user.
-
-  ## Examples
-
-      iex> deliver_user_update_email_instructions(user, current_email, &url(~p"/users/settings/confirm-email/#{&1}"))
-      {:ok, %{to: ..., body: ...}}
-
   """
   def deliver_user_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
       when is_function(update_email_url_fun, 1) do
@@ -273,16 +192,6 @@ defmodule Dustoff.Accounts do
 
     Repo.insert!(user_token)
     UserNotifier.deliver_update_email_instructions(user, update_email_url_fun.(encoded_token))
-  end
-
-  @doc ~S"""
-  Delivers the magic link login instructions to the given user.
-  """
-  def deliver_login_instructions(%User{} = user, magic_link_url_fun)
-      when is_function(magic_link_url_fun, 1) do
-    {encoded_token, user_token} = UserToken.build_email_token(user, "login")
-    Repo.insert!(user_token)
-    UserNotifier.deliver_login_instructions(user, magic_link_url_fun.(encoded_token))
   end
 
   @doc """

@@ -170,7 +170,7 @@ defmodule DustoffWeb.UserAuth do
   Plug for routes that require sudo mode.
   """
   def require_sudo_mode(conn, _opts) do
-    if Accounts.sudo_mode?(conn.assigns.current_scope.user, -10) do
+    if Accounts.recently_authenticated?(conn.assigns.current_scope.user, -10) do
       conn
     else
       conn
