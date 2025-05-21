@@ -42,6 +42,7 @@ defmodule Dustoff.AccountsFixtures do
     Scope.for_user(user)
   end
 
+  # This seems like it can be deleted, if we have a `user_fixture/1` that has a password.
   def set_password(user) do
     {:ok, user, _expired_tokens} =
       Accounts.update_user_password(user, %{password: valid_user_password()})
