@@ -1,7 +1,24 @@
 defmodule Dustoff.Accounts.UserToken do
   use Ecto.Schema
+
   import Ecto.Query
+
   alias Dustoff.Accounts.UserToken
+
+  @typedoc """
+  A type describing a repo-sourced `Dustoff.Accounts.UserToken` entity.
+  """
+  @type t() :: %__MODULE__{
+          id: id(),
+          user_id: Dustoff.Accounts.User.id(),
+          token: String.t(),
+          context: String.t(),
+          sent_to: String.t() | nil,
+          authenticated_at: DateTime.t() | nil,
+          inserted_at: DateTime.t()
+        }
+
+  @type id() :: Ecto.UUID.t()
 
   @hash_algorithm :sha256
   @rand_size 32

@@ -1,6 +1,25 @@
 defmodule Dustoff.Accounts.User do
   use Ecto.Schema
+
   import Ecto.Changeset
+
+  @typedoc """
+  A type describing a repo-sourced `Dustoff.Accounts.User` entity.
+  """
+  @type t() :: %__MODULE__{
+          id: id(),
+          email: String.t(),
+          hashed_password: String.t(),
+          confirmed_at: DateTime.t() | nil,
+          authenticated_at: DateTime.t() | nil,
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
+
+  @type changeset() :: Ecto.Changeset.t(t())
+
+  @type id() :: Ecto.UUID.t()
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
