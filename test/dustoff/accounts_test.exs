@@ -1,5 +1,5 @@
 defmodule Dustoff.AccountsTest do
-  use Dustoff.DataCase
+  use Dustoff.DataCase, async: true
 
   alias Dustoff.Accounts
 
