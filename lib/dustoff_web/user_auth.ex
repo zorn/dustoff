@@ -110,7 +110,7 @@ defmodule DustoffWeb.UserAuth do
 
   # This function is the one responsible for creating session tokens
   # and storing them safely in the session and cookies. It may be called
-  # either when logging in, during sudo mode, or to renew a session which
+  # either when logging in or to renew a session which
   # will soon expire.
   #
   # When the session is created, rather than extended, the renew_session
