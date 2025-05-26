@@ -1,10 +1,12 @@
 {
     "cSpell.words": [
+        "citext",
         "Dustoff",
         "ecto",
         "erlef",
         "fieldset",
         "flexbox",
+        "gatekeep",
         "Heroicon",
         "Heroicons",
         "isready",
@@ -13,7 +15,10 @@
         "minlength",
         "Rebar",
         "sobelow",
+        "timestamptz",
+        "typespecs",
         "Uncategorized",
+        "usec",
         "Valim"
     ]
 }
