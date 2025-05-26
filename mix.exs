@@ -10,7 +10,10 @@ defmodule Dustoff.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      dialyzer: [
+        plt_add_apps: [:ex_unit]
+      ]
     ]
   end
 
@@ -33,6 +36,12 @@ defmodule Dustoff.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # For TDD.
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
+
+      # For password hashing.
+      {:argon2_elixir, "~> 4.0"},
+
       # For code logic style and enforcement.
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
@@ -89,7 +98,14 @@ defmodule Dustoff.MixProject do
         "esbuild dustoff --minify",
         "phx.digest"
       ],
-      check: ["credo --strict", "dialyzer", "sobelow"]
+      check: ["credo --strict", "dialyzer", "sobelow", "test"]
     ]
+  end
+
+  def cli do
+    # Using the MIX_ENV of `:test` for the check alias is required for testing.
+    # This does mean that dialyzer and sobelow will run in test mode which is
+    # not what you typically see when running `mix dialyzer` or `mix sobelow`.
+    [preferred_envs: [check: :test]]
   end
 end
