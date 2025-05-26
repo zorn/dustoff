@@ -1,7 +1,16 @@
 defmodule Dustoff.Accounts.UserToken do
   @moduledoc """
-  A entity that stores a token identity related to an account action to be acted
+  A entity that stores a token value related to an account action to be acted
   upon later, usually via an emailed link.
+
+  ## Fields
+
+  * `:token` - The token value.
+  * `:context` - The context of the token, such as "session" or "change:email".
+  * `:sent_to` - The email address the token was sent to.
+  * `:authenticated_at` - The date and time the user account was last authenticated.
+  * `:user_id` - The identity of the user the token is related to.
+  * `:inserted_at` - The date and time the user token entity was created.
   """
 
   use Ecto.Schema

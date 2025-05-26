@@ -1,8 +1,21 @@
 defmodule Dustoff.Accounts.User do
   @moduledoc """
-  TBD
+  An entity representing a registered user account.
 
-  Maybe document what each field is used for.
+  ## Fields
+
+  * `:id` - The identity of this entity, a UUID value.
+  * `:email` - The current email address the user wants to be recognized by.
+  * `:hashed_password` - The hashed password of the user account.
+  * `:confirmed_at` - The date and time the email address was confirmed.
+    Currently we do not force users to confirm their email address, but this
+    field remains in place as we are likely to add this feature in the future.
+  * `:authenticated_at` - The date and time the user account was last
+    authenticated. This value is `virtual` and the source of truth is the
+    `Dustoff.Accounts.UserToken` entity. The value is attached to the user
+    struct value to make some code flows more performant.
+  * `:inserted_at` - The date and time the user entity was created.
+  * `:updated_at` - The date and time the user entity was last updated.
   """
 
   use Ecto.Schema
