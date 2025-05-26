@@ -17,6 +17,8 @@ defmodule DustoffWeb.ConnCase do
 
   use ExUnit.CaseTemplate
 
+  alias Dustoff.Accounts.User
+
   using do
     quote do
       # The default endpoint for testing
@@ -62,7 +64,7 @@ defmodule DustoffWeb.ConnCase do
 
   It returns an updated `conn`.
   """
-  @spec log_in_user(Plug.Conn.t(), User.t(), Keyword.t()) :: Plug.Conn.t()
+  @spec log_in_user(Plug.Conn.t(), User.t(), opts :: Keyword.t()) :: Plug.Conn.t()
   def log_in_user(conn, user, opts \\ []) do
     token = Dustoff.Accounts.generate_user_session_token(user)
 
