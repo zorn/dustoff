@@ -21,7 +21,7 @@ defmodule Dustoff.Accounts.Scope do
   defstruct user: nil
 
   @type t() :: %__MODULE__{
-          user: User.t()
+          user: User.t() | nil
         }
 
   @doc """
