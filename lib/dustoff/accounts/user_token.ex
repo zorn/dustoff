@@ -1,7 +1,7 @@
 defmodule Dustoff.Accounts.UserToken do
   @moduledoc """
   A entity that stores a token value related to an account action to be acted
-  upon later, usually via an emailed link.
+  upon later, usually via an emailed link or a signed session cookie.
 
   ## Fields
 
@@ -85,7 +85,6 @@ defmodule Dustoff.Accounts.UserToken do
   and devices in the UI and allow users to explicitly expire any
   session they deem invalid.
   """
-  # Because we are mearly creating the struct value, the return type here is not a `t()` but instead a struct.
   @spec build_session_token(user :: User.t()) :: {token :: String.t(), user_token :: struct_t()}
   def build_session_token(user) do
     token = :crypto.strong_rand_bytes(@rand_size)
