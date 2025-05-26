@@ -95,7 +95,14 @@ defmodule Dustoff.MixProject do
         "esbuild dustoff --minify",
         "phx.digest"
       ],
-      check: ["credo --strict", "dialyzer", "sobelow"]
+      check: ["credo --strict", "dialyzer", "sobelow", "test"]
     ]
+  end
+
+  def cli do
+    # Using the MIX_ENV of `:test` for the check alias is required for testing.
+    # This does mean that dialyzer and sobelow will run in test mode which is
+    # not what you typically see when running `mix dialyzer` or `mix sobelow`.
+    [preferred_envs: [check: :test]]
   end
 end
