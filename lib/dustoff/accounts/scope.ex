@@ -20,11 +20,16 @@ defmodule Dustoff.Accounts.Scope do
 
   defstruct user: nil
 
+  @type t() :: %__MODULE__{
+          user: User.t()
+        }
+
   @doc """
   Creates a scope for the given user.
 
   Returns nil if no user is given.
   """
+  @spec for_user(user :: User.t() | nil) :: t() | nil
   def for_user(%User{} = user) do
     %__MODULE__{user: user}
   end

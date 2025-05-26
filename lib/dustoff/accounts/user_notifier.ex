@@ -5,9 +5,15 @@ defmodule Dustoff.Accounts.UserNotifier do
 
   import Swoosh.Email
 
+  alias Dustoff.Accounts.User
   alias Dustoff.Mailer
 
   # Delivers the email using the application mailer.
+  @spec deliver(
+          recipient :: String.t(),
+          subject :: String.t(),
+          body :: String.t()
+        ) :: {:ok, Swoosh.Email.t()} | {:error, any()}
   defp deliver(recipient, subject, body) do
     email =
       new()
@@ -24,6 +30,10 @@ defmodule Dustoff.Accounts.UserNotifier do
   @doc """
   Deliver instructions to update a user email.
   """
+  @spec deliver_update_email_instructions(
+          user :: User.t(),
+          url :: String.t()
+        ) :: {:ok, Swoosh.Email.t()} | {:error, any()}
   def deliver_update_email_instructions(user, url) do
     deliver(user.email, "Update email instructions", """
 

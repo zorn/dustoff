@@ -4,6 +4,7 @@ defmodule DustoffWeb.UserSessionController do
   alias Dustoff.Accounts
   alias DustoffWeb.UserAuth
 
+  @spec new(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def new(conn, _params) do
     email = get_in(conn.assigns, [:current_scope, Access.key(:user), Access.key(:email)])
     form = Phoenix.Component.to_form(%{"email" => email}, as: "user")
@@ -11,7 +12,7 @@ defmodule DustoffWeb.UserSessionController do
     render(conn, :new, form: form)
   end
 
-  # email + password login
+  @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(conn, %{"user" => %{"email" => email, "password" => password} = user_params}) do
     if user = Accounts.get_user_by_email_and_password(email, password) do
       conn
@@ -27,6 +28,7 @@ defmodule DustoffWeb.UserSessionController do
     end
   end
 
+  @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "Logged out successfully.")

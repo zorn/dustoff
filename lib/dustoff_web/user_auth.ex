@@ -10,6 +10,7 @@ defmodule DustoffWeb.UserAuth do
 
   alias Dustoff.Accounts
   alias Dustoff.Accounts.Scope
+  alias Dustoff.Accounts.User
 
   # Make the remember me cookie valid for 14 days. This should match
   # the session validity setting in UserToken.
@@ -36,6 +37,7 @@ defmodule DustoffWeb.UserAuth do
   Redirects to the session's `:user_return_to` path
   or falls back to the `signed_in_path/1`.
   """
+  @spec log_in_user(Plug.Conn.t(), User.t(), map()) :: Plug.Conn.t()
   def log_in_user(conn, user, params \\ %{}) do
     user_return_to = get_session(conn, :user_return_to)
 
@@ -49,6 +51,7 @@ defmodule DustoffWeb.UserAuth do
 
   It clears all session data for safety. See renew_session.
   """
+  @spec log_out_user(Plug.Conn.t()) :: Plug.Conn.t()
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
     user_token && Accounts.delete_user_session_token(user_token)
@@ -68,6 +71,7 @@ defmodule DustoffWeb.UserAuth do
 
   Will reissue the session token if it is older than the configured age.
   """
+  @spec fetch_current_scope_for_user(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def fetch_current_scope_for_user(conn, _opts) do
     with {token, conn} <- ensure_user_token(conn),
          {user, token_inserted_at} <- Accounts.get_user_by_session_token(token) do
@@ -171,9 +175,10 @@ defmodule DustoffWeb.UserAuth do
   end
 
   @doc """
-  Plug for routes that require sudo mode.
+  Plug for routes that require `recently_authenticated?/2`.
   """
-  def require_sudo_mode(conn, _opts) do
+  @spec require_recently_authenticated(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
+  def require_recently_authenticated(conn, _opts) do
     if Accounts.recently_authenticated?(conn.assigns.current_scope.user, -10) do
       conn
     else
@@ -188,6 +193,7 @@ defmodule DustoffWeb.UserAuth do
   @doc """
   Plug for routes that require the user to not be authenticated.
   """
+  @spec redirect_if_user_is_authenticated(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def redirect_if_user_is_authenticated(conn, _opts) do
     if conn.assigns.current_scope do
       conn
@@ -203,6 +209,7 @@ defmodule DustoffWeb.UserAuth do
   @doc """
   Plug for routes that require the user to be authenticated.
   """
+  @spec require_authenticated_user(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def require_authenticated_user(conn, _opts) do
     if conn.assigns.current_scope && conn.assigns.current_scope.user do
       conn

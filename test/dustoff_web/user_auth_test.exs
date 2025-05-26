@@ -185,13 +185,13 @@ defmodule DustoffWeb.UserAuthTest do
     end
   end
 
-  describe "require_sudo_mode/2" do
+  describe "require_recently_authenticated/2" do
     test "allows users that have authenticated in the last 10 minutes", %{conn: conn, user: user} do
       conn =
         conn
         |> fetch_flash()
         |> assign(:current_scope, Scope.for_user(user))
-        |> UserAuth.require_sudo_mode([])
+        |> UserAuth.require_recently_authenticated([])
 
       refute conn.halted
       refute conn.status
@@ -209,7 +209,7 @@ defmodule DustoffWeb.UserAuthTest do
         conn
         |> fetch_flash()
         |> assign(:current_scope, Scope.for_user(user))
-        |> UserAuth.require_sudo_mode([])
+        |> UserAuth.require_recently_authenticated([])
 
       assert redirected_to(conn) == ~p"/users/log-in"
 

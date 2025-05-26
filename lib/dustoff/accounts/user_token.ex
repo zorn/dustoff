@@ -8,20 +8,28 @@ defmodule Dustoff.Accounts.UserToken do
 
   import Ecto.Query
 
+  alias Dustoff.Accounts.User
   alias Dustoff.Accounts.UserToken
 
   @typedoc """
   A type describing a repo-sourced `Dustoff.Accounts.UserToken` entity.
   """
   @type t() :: %__MODULE__{
-          id: id(),
-          user_id: Dustoff.Accounts.User.id(),
           token: String.t(),
           context: String.t(),
           sent_to: String.t() | nil,
           authenticated_at: DateTime.t() | nil,
+          user_id: Dustoff.Accounts.User.id(),
           inserted_at: DateTime.t()
         }
+
+  @typedoc """
+  A type describing a simple struct value of `Dustoff.Accounts.UserToken`.
+
+  This type is sometimes needed when want to compose a function typespec that
+  will return a non-repo sourced struct value.
+  """
+  @type struct_t() :: %__MODULE__{}
 
   @type id() :: Ecto.UUID.t()
 
@@ -65,6 +73,8 @@ defmodule Dustoff.Accounts.UserToken do
   and devices in the UI and allow users to explicitly expire any
   session they deem invalid.
   """
+  # Because we are mearly creating the struct value, the return type here is not a `t()` but instead a struct.
+  @spec build_session_token(user :: User.t()) :: {token :: String.t(), user_token :: struct_t()}
   def build_session_token(user) do
     token = :crypto.strong_rand_bytes(@rand_size)
     dt = user.authenticated_at || DateTime.utc_now(:second)
@@ -74,11 +84,13 @@ defmodule Dustoff.Accounts.UserToken do
   @doc """
   Checks if the token is valid and returns its underlying lookup query.
 
-  The query returns the user found by the token, if any, along with the token's creation time.
+  The query returns the user found by the token, if any, along with the token's
+  creation time.
 
-  The token is valid if it matches the value in the database and it has
-  not expired (after @session_validity_in_days).
+  The token is valid if it matches the value in the database and it has not
+  expired (after @session_validity_in_days).
   """
+  @spec verify_session_token_query(token :: String.t()) :: {:ok, Ecto.Query.t()}
   def verify_session_token_query(token) do
     query =
       from token in by_token_and_context_query(token, "session"),
@@ -102,6 +114,8 @@ defmodule Dustoff.Accounts.UserToken do
   Users can easily adapt the existing code to provide other types of delivery methods,
   for example, by phone numbers.
   """
+  @spec build_email_token(user :: User.t(), context :: String.t()) ::
+          {token :: String.t(), user_token :: struct_t()}
   def build_email_token(user, context) do
     build_hashed_token(user, context, user.email)
   end
@@ -128,6 +142,7 @@ defmodule Dustoff.Accounts.UserToken do
   database. This function also checks if the token is being used within
   15 minutes. The context of a magic link token is always "login".
   """
+  @spec verify_magic_link_token_query(token :: String.t()) :: {:ok, Ecto.Query.t()}
   def verify_magic_link_token_query(token) do
     case Base.url_decode64(token, padding: false) do
       {:ok, decoded_token} ->
@@ -158,6 +173,8 @@ defmodule Dustoff.Accounts.UserToken do
   database and if it has not expired (after @change_email_validity_in_days).
   The context must always start with "change:".
   """
+  @spec verify_change_email_token_query(token :: String.t(), context :: String.t()) ::
+          {:ok, Ecto.Query.t()} | :error
   def verify_change_email_token_query(token, "change:" <> _ = context) do
     case Base.url_decode64(token, padding: false) do
       {:ok, decoded_token} ->
@@ -177,6 +194,7 @@ defmodule Dustoff.Accounts.UserToken do
   @doc """
   Returns the token struct for the given token value and context.
   """
+  @spec by_token_and_context_query(token :: String.t(), context :: String.t()) :: Ecto.Query.t()
   def by_token_and_context_query(token, context) do
     from UserToken, where: [token: ^token, context: ^context]
   end
@@ -184,10 +202,12 @@ defmodule Dustoff.Accounts.UserToken do
   @doc """
   Gets all tokens for the given user for the given contexts.
   """
+  @spec by_user_and_contexts_query(user :: User.t(), :all | [String.t()]) :: Ecto.Query.t()
   def by_user_and_contexts_query(user, :all) do
     from t in UserToken, where: t.user_id == ^user.id
   end
 
+  @spec by_user_and_contexts_query(user :: User.t(), [String.t()]) :: Ecto.Query.t()
   def by_user_and_contexts_query(user, [_ | _] = contexts) do
     from t in UserToken, where: t.user_id == ^user.id and t.context in ^contexts
   end
@@ -195,6 +215,7 @@ defmodule Dustoff.Accounts.UserToken do
   @doc """
   Deletes a list of tokens.
   """
+  @spec delete_all_query([UserToken.t()]) :: Ecto.Query.t()
   def delete_all_query(tokens) do
     from t in UserToken, where: t.id in ^Enum.map(tokens, & &1.id)
   end

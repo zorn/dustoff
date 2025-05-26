@@ -53,6 +53,7 @@ defmodule Dustoff.Accounts.User do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
   """
+  @spec registration_changeset(attrs :: map(), opts :: Keyword.t()) :: changeset()
   def registration_changeset(attrs, opts \\ []) do
     %__MODULE__{}
     |> cast(attrs, [:email, :password])
@@ -74,6 +75,7 @@ defmodule Dustoff.Accounts.User do
       uniqueness of the email, useful when displaying live validations.
       Defaults to `true`.
   """
+  @spec email_changeset(user :: t(), attrs :: map(), opts :: Keyword.t()) :: changeset()
   def email_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email])
@@ -122,6 +124,7 @@ defmodule Dustoff.Accounts.User do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
   """
+  @spec password_changeset(user :: t(), attrs :: map(), opts :: Keyword.t()) :: changeset()
   def password_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:password])
@@ -158,6 +161,7 @@ defmodule Dustoff.Accounts.User do
   @doc """
   Confirms the account by setting `confirmed_at`.
   """
+  @spec confirm_changeset(user :: t()) :: changeset()
   def confirm_changeset(user) do
     now = DateTime.utc_now(:second)
     change(user, confirmed_at: now)
@@ -169,7 +173,8 @@ defmodule Dustoff.Accounts.User do
   If there is no user or the user doesn't have a password, we call
   `Argon2.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%Dustoff.Accounts.User{hashed_password: hashed_password}, password)
+  @spec valid_password?(user :: t(), password :: String.t()) :: boolean()
+  def valid_password?(%__MODULE__{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Argon2.verify_pass(password, hashed_password)
   end

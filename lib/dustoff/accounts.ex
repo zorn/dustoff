@@ -188,6 +188,11 @@ defmodule Dustoff.Accounts do
   @doc """
   Delivers the update email instructions to the given user.
   """
+  @spec deliver_user_update_email_instructions(
+          user :: User.t(),
+          current_email :: String.t(),
+          update_email_url_fun :: (String.t() -> String.t())
+        ) :: {:ok, Swoosh.Email.t()} | {:error, any()}
   def deliver_user_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
       when is_function(update_email_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
@@ -199,6 +204,7 @@ defmodule Dustoff.Accounts do
   @doc """
   Deletes the signed token with the given context.
   """
+  @spec delete_user_session_token(token :: String.t()) :: :ok
   def delete_user_session_token(token) do
     Repo.delete_all(UserToken.by_token_and_context_query(token, "session"))
     :ok
