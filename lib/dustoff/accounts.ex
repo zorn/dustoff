@@ -152,10 +152,12 @@ defmodule Dustoff.Accounts do
   @spec update_user_password(user :: User.t(), attrs :: map()) ::
           {:ok, User.t(), [UserToken.t()]} | {:error, User.changeset()}
   def update_user_password(user, attrs) do
-    user
-    |> User.password_changeset(attrs)
-    |> update_user_and_delete_all_tokens()
-    |> case do
+    result =
+      user
+      |> User.password_changeset(attrs)
+      |> update_user_and_delete_all_tokens()
+
+    case result do
       {:ok, user, expired_tokens} -> {:ok, user, expired_tokens}
       {:error, :user, changeset, _} -> {:error, changeset}
     end

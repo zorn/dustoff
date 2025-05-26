@@ -1,10 +1,11 @@
 defmodule Dustoff.AccountsTest do
   use Dustoff.DataCase, async: true
 
-  alias Dustoff.Accounts
-
   import Dustoff.AccountsFixtures
-  alias Dustoff.Accounts.{User, UserToken}
+
+  alias Dustoff.Accounts
+  alias Dustoff.Accounts.User
+  alias Dustoff.Accounts.UserToken
 
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do

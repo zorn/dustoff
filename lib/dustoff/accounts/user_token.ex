@@ -1,4 +1,9 @@
 defmodule Dustoff.Accounts.UserToken do
+  @moduledoc """
+  A entity that stores a token identity related to an account action to be acted
+  upon later, usually via an emailed link.
+  """
+
   use Ecto.Schema
 
   import Ecto.Query

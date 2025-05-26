@@ -1,4 +1,8 @@
 defmodule DustoffWeb.UserAuth do
+  @moduledoc """
+  Provides authentication and authorization functions.
+  """
+
   use DustoffWeb, :verified_routes
 
   import Plug.Conn

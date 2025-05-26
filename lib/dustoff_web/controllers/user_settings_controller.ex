@@ -1,10 +1,10 @@
 defmodule DustoffWeb.UserSettingsController do
   use DustoffWeb, :controller
 
+  import DustoffWeb.UserAuth, only: [require_sudo_mode: 2]
+
   alias Dustoff.Accounts
   alias DustoffWeb.UserAuth
-
-  import DustoffWeb.UserAuth, only: [require_sudo_mode: 2]
 
   plug :require_sudo_mode
   plug :assign_email_and_password_changesets

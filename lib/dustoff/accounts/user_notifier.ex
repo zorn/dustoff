@@ -1,4 +1,8 @@
 defmodule Dustoff.Accounts.UserNotifier do
+  @moduledoc """
+  Provides functions for delivering emails to users.
+  """
+
   import Swoosh.Email
 
   alias Dustoff.Mailer

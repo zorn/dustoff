@@ -1,8 +1,9 @@
 defmodule DustoffWeb.UserSettingsControllerTest do
   use DustoffWeb.ConnCase, async: true
 
-  alias Dustoff.Accounts
   import Dustoff.AccountsFixtures
+
+  alias Dustoff.Accounts
 
   setup :register_and_log_in_user
 
