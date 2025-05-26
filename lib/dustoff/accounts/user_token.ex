@@ -21,7 +21,7 @@ defmodule Dustoff.Accounts.UserToken do
   alias Dustoff.Accounts.UserToken
 
   @typedoc """
-  A type describing a repo-sourced `Dustoff.Accounts.UserToken` entity.
+  A repo-sourced `Dustoff.Accounts.UserToken` entity.
   """
   @type t() :: %__MODULE__{
           token: String.t(),
@@ -33,13 +33,16 @@ defmodule Dustoff.Accounts.UserToken do
         }
 
   @typedoc """
-  A type describing a simple struct value of `Dustoff.Accounts.UserToken`.
+  A simple struct type of a `Dustoff.Accounts.UserToken` entity.
 
   This type is sometimes needed when want to compose a function typespec that
   will return a non-repo sourced struct value.
   """
   @type struct_t() :: %__MODULE__{}
 
+  @typedoc """
+  The identity value type of a `Dustoff.Accounts.UserToken` entity.
+  """
   @type id() :: Ecto.UUID.t()
 
   @hash_algorithm :sha256

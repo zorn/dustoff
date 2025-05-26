@@ -23,7 +23,7 @@ defmodule Dustoff.Accounts.User do
   import Ecto.Changeset
 
   @typedoc """
-  A type describing a repo-sourced `Dustoff.Accounts.User` entity.
+  A repo-sourced `Dustoff.Accounts.User` entity.
   """
   @type t() :: %__MODULE__{
           id: id(),
@@ -35,8 +35,14 @@ defmodule Dustoff.Accounts.User do
           updated_at: DateTime.t()
         }
 
+  @typedoc """
+  An `Ecto.Changeset` for a repo-sourced `Dustoff.Accounts.User` entity.
+  """
   @type changeset() :: Ecto.Changeset.t(t())
 
+  @typedoc """
+  The identity value type of a `Dustoff.Accounts.User` entity.
+  """
   @type id() :: Ecto.UUID.t()
 
   @primary_key {:id, :binary_id, autogenerate: true}
