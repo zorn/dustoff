@@ -10,7 +10,10 @@ defmodule Dustoff.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      dialyzer: [
+        plt_add_apps: [:ex_unit]
+      ]
     ]
   end
 
