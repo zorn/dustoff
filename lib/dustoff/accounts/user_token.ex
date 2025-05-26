@@ -51,7 +51,7 @@ defmodule Dustoff.Accounts.UserToken do
     field :authenticated_at, :utc_datetime
     belongs_to :user, Dustoff.Accounts.User
 
-    timestamps(type: :utc_datetime, updated_at: false)
+    timestamps(type: :utc_datetime_usec, updated_at: false)
   end
 
   @doc """
