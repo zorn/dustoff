@@ -30,17 +30,15 @@ defmodule Dustoff.Accounts do
   end
 
   @doc """
-  Gets a single `Dustoff.Accounts.User` entity.
+  Gets a `Dustoff.Accounts.User` entity by id.
 
   Raises `Ecto.NoResultsError` if the User does not exist.
   """
   @spec get_user!(User.id()) :: User.t()
   def get_user!(id), do: Repo.get!(User, id)
 
-  ## User registration
-
   @doc """
-  Registers a user.
+  Registers a new user account, creating a `Dustoff.Accounts.User` entity.
   """
   @spec register_user(attrs :: map()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_user(attrs) do
@@ -49,15 +47,13 @@ defmodule Dustoff.Accounts do
     |> Repo.insert()
   end
 
-  ## Settings
-
   @doc """
   Returns `true` when the user is considered recently authenticated.
 
   Recently is defined by default as the last authentication was done no further
   than 20 minutes ago.
 
-  The time limit in minutes can be given as second argument in minutes.
+  The time limit in minutes can be given as second argument.
   """
   @spec recently_authenticated?(User.t(), minutes :: integer()) :: boolean()
   def recently_authenticated?(user, minutes \\ -20)
@@ -70,12 +66,14 @@ defmodule Dustoff.Accounts do
 
   def recently_authenticated?(_user, _minutes) do
     # If the previous pattern match failed, it was likely due to the user not
-    # having an `authenticated_at` field value, as in they have never authenticated.
+    # having an `authenticated_at` field value, as in they have never
+    # authenticated. This is not expected since we dropped the magic link log in
+    # leaving in this return `false` for completeness.
     false
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for registering a new account.
+  Returns an `%Ecto.Changeset{}` for registering a new user account.
 
   See `Dustoff.Accounts.User.registration_changeset/2` for a list of supported options.
   """
@@ -164,7 +162,7 @@ defmodule Dustoff.Accounts do
   end
 
   @doc """
-  Generates and persists a session token.
+  Generates and persists a session-related `Dustoff.Accounts.UserToken` entity.
   """
   @spec generate_user_session_token(user :: User.t()) :: token :: String.t()
   def generate_user_session_token(user) do
@@ -174,7 +172,7 @@ defmodule Dustoff.Accounts do
   end
 
   @doc """
-  Gets a `Dustoff.Accounts.User` entity with the given signed token.
+  Gets a `Dustoff.Accounts.User` entity for the given signed token.
 
   If the token is valid `{user, token_inserted_at}` is returned, otherwise `nil` is returned.
   """
@@ -209,8 +207,6 @@ defmodule Dustoff.Accounts do
     Repo.delete_all(UserToken.by_token_and_context_query(token, "session"))
     :ok
   end
-
-  ## Token helper
 
   defp update_user_and_delete_all_tokens(changeset) do
     %{data: %User{} = user} = changeset
