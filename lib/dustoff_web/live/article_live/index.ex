@@ -66,6 +66,7 @@ defmodule DustoffWeb.ArticleLive.Index do
   @impl true
   def handle_info({type, %Dustoff.Articles.Article{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply, stream(socket, :articles, Articles.list_articles(socket.assigns.current_scope), reset: true)}
+    {:noreply,
+     stream(socket, :articles, Articles.list_articles(socket.assigns.current_scope), reset: true)}
   end
 end

@@ -4,8 +4,16 @@ defmodule DustoffWeb.ArticleLiveTest do
   import Phoenix.LiveViewTest
   import Dustoff.ArticlesFixtures
 
-  @create_attrs %{title: "some title", body: "some body", published_at: "2025-05-26T18:25:00.000000Z"}
-  @update_attrs %{title: "some updated title", body: "some updated body", published_at: "2025-05-27T18:25:00.000000Z"}
+  @create_attrs %{
+    title: "some title",
+    body: "some body",
+    published_at: "2025-05-26T18:25:00.000000Z"
+  }
+  @update_attrs %{
+    title: "some updated title",
+    body: "some updated body",
+    published_at: "2025-05-27T18:25:00.000000Z"
+  }
   @invalid_attrs %{title: nil, body: nil, published_at: nil}
 
   setup :register_and_log_in_user

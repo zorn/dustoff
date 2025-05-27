@@ -29,7 +29,12 @@ defmodule Dustoff.ArticlesTest do
     end
 
     test "create_article/2 with valid data creates a article" do
-      valid_attrs = %{title: "some title", body: "some body", published_at: ~U[2025-05-26 18:25:00.000000Z]}
+      valid_attrs = %{
+        title: "some title",
+        body: "some body",
+        published_at: ~U[2025-05-26 18:25:00.000000Z]
+      }
+
       scope = user_scope_fixture()
 
       assert {:ok, %Article{} = article} = Articles.create_article(scope, valid_attrs)
@@ -47,7 +52,12 @@ defmodule Dustoff.ArticlesTest do
     test "update_article/3 with valid data updates the article" do
       scope = user_scope_fixture()
       article = article_fixture(scope)
-      update_attrs = %{title: "some updated title", body: "some updated body", published_at: ~U[2025-05-27 18:25:00.000000Z]}
+
+      update_attrs = %{
+        title: "some updated title",
+        body: "some updated body",
+        published_at: ~U[2025-05-27 18:25:00.000000Z]
+      }
 
       assert {:ok, %Article{} = article} = Articles.update_article(scope, article, update_attrs)
       assert article.title == "some updated title"

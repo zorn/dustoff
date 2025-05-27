@@ -57,7 +57,13 @@ defmodule DustoffWeb.ArticleLive.Form do
 
   @impl true
   def handle_event("validate", %{"article" => article_params}, socket) do
-    changeset = Articles.change_article(socket.assigns.current_scope, socket.assigns.article, article_params)
+    changeset =
+      Articles.change_article(
+        socket.assigns.current_scope,
+        socket.assigns.article,
+        article_params
+      )
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -66,7 +72,11 @@ defmodule DustoffWeb.ArticleLive.Form do
   end
 
   defp save_article(socket, :edit, article_params) do
-    case Articles.update_article(socket.assigns.current_scope, socket.assigns.article, article_params) do
+    case Articles.update_article(
+           socket.assigns.current_scope,
+           socket.assigns.article,
+           article_params
+         ) do
       {:ok, article} ->
         {:noreply,
          socket
