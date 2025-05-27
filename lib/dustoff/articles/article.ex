@@ -17,7 +17,7 @@ defmodule Dustoff.Articles.Article do
   def changeset(article, attrs, user_scope) do
     article
     |> cast(attrs, [:title, :body, :published_at])
-    |> validate_required([:title, :body, :published_at])
+    |> validate_required([:title, :body])
     |> put_change(:user_id, user_scope.user.id)
   end
 end
