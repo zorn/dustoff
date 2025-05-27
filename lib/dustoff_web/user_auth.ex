@@ -204,7 +204,90 @@ defmodule DustoffWeb.UserAuth do
     end
   end
 
-  defp signed_in_path(_conn), do: ~p"/"
+  @doc """
+  Handles mounting and authenticating the current_scope in LiveViews.
+
+  ## `on_mount` arguments
+
+    * `:mount_current_scope` - Assigns current_scope
+      to socket assigns based on user_token, or nil if
+      there's no user_token or no matching user.
+
+    * `:require_authenticated` - Authenticates the user from the session,
+      and assigns the current_scope to socket assigns based
+      on user_token.
+      Redirects to login page if there's no logged user.
+
+  ## Examples
+
+  Use the `on_mount` lifecycle macro in LiveViews to mount or authenticate
+  the `current_scope`:
+
+      defmodule HelloWeb.PageLive do
+        use HelloWeb, :live_view
+
+        on_mount {HelloWeb.UserAuth, :mount_current_scope}
+        ...
+      end
+
+  Or use the `live_session` of your router to invoke the on_mount callback:
+
+      live_session :authenticated, on_mount: [{HelloWeb.UserAuth, :require_authenticated}] do
+        live "/profile", ProfileLive, :index
+      end
+  """
+  def on_mount(:mount_current_scope, _params, session, socket) do
+    {:cont, mount_current_scope(socket, session)}
+  end
+
+  def on_mount(:require_authenticated, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope && socket.assigns.current_scope.user do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "You must log in to access this page.")
+        |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
+
+      {:halt, socket}
+    end
+  end
+
+  def on_mount(:require_recently_authenticated, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if Accounts.recently_authenticated?(socket.assigns.current_scope.user, -10) do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "You must re-authenticate to access this page.")
+        |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
+
+      {:halt, socket}
+    end
+  end
+
+  defp mount_current_scope(socket, session) do
+    Phoenix.Component.assign_new(socket, :current_scope, fn ->
+      {user, _} =
+        if user_token = session["user_token"] do
+          Accounts.get_user_by_session_token(user_token)
+        end || {nil, nil}
+
+      Scope.for_user(user)
+    end)
+  end
+
+  @doc "Returns the path to redirect to after log in."
+  # the user was already logged in, redirect to settings
+  def signed_in_path(%Plug.Conn{assigns: %{current_scope: %Scope{user: %Accounts.User{}}}}) do
+    ~p"/users/settings"
+  end
+
+  def signed_in_path(_conn), do: ~p"/"
 
   @doc """
   Plug for routes that require the user to be authenticated.

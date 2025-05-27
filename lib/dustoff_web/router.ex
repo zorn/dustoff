@@ -70,6 +70,18 @@ defmodule DustoffWeb.Router do
   end
 
   scope "/", DustoffWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{DustoffWeb.UserAuth, :require_authenticated}] do
+      live "/articles", ArticleLive.Index, :index
+      live "/articles/new", ArticleLive.Form, :new
+      live "/articles/:id", ArticleLive.Show, :show
+      live "/articles/:id/edit", ArticleLive.Form, :edit
+    end
+  end
+
+  scope "/", DustoffWeb do
     pipe_through [:browser]
 
     get "/users/log-in", UserSessionController, :new
