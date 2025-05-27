@@ -14,7 +14,8 @@ defmodule DustoffWeb.Router do
     # so we need to allow them with `img-src`.
     # https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
     plug :put_secure_browser_headers, %{
-      "content-security-policy" => "default-src 'self'; img-src 'self' data:"
+      "content-security-policy" =>
+        "default-src 'self'; script-src 'self' 'nonce-123'; img-src 'self' data:"
     }
 
     plug :fetch_current_scope_for_user
