@@ -15,7 +15,7 @@ defmodule DustoffWeb.Router do
     # https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
     plug :put_secure_browser_headers, %{
       "content-security-policy" =>
-        "default-src 'self'; script-src 'self' 'nonce-123'; img-src 'self' data:"
+        "default-src 'self'; img-src 'self' data:; script-src 'self' 'sha256-FChCV07pq1+qZclQt6vd9cHIb8pbHMGK8feTB2U+dW4='"
     }
 
     plug :fetch_current_scope_for_user
