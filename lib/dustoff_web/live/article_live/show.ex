@@ -28,6 +28,11 @@ defmodule DustoffWeb.ArticleLive.Show do
             <.local_datetime datetime={@article.published_at} />
           <% else %>
             Not Published
+            <%!-- I'd like this button to be smaller or better laid out on
+            the page, but our current button component doesn't support that. --%>
+            <.button phx-click="publish" variant="primary">
+              Publish Article
+            </.button>
           <% end %>
         </:item>
       </.list>
@@ -68,5 +73,16 @@ defmodule DustoffWeb.ArticleLive.Show do
   def handle_info({type, %Dustoff.Articles.Article{}}, socket)
       when type in [:created, :updated, :deleted] do
     {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("publish", _params, socket) do
+    case Articles.publish_article(socket.assigns.current_scope, socket.assigns.article) do
+      {:ok, article} ->
+        {:noreply, assign(socket, :article, article)}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to publish article.")}
+    end
   end
 end
