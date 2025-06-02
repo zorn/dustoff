@@ -15,6 +15,8 @@ defmodule Dustoff.Articles.Article do
 
   import Ecto.Changeset
 
+  alias Dustoff.Accounts.Scope
+
   @typedoc """
   A repo-sourced `Dustoff.Articles.Article` entity.
   """

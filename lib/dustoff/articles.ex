@@ -156,7 +156,7 @@ defmodule Dustoff.Articles do
   """
   @spec change_article(
           scope :: Scope.t(),
-          article :: Article.t(),
+          article :: Article.t() | Article.struct_t(),
           attrs :: map()
         ) :: Article.changeset()
   def change_article(%Scope{} = scope, %Article{} = article, attrs \\ %{}) do
