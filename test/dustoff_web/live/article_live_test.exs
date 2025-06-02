@@ -6,15 +6,13 @@ defmodule DustoffWeb.ArticleLiveTest do
 
   @create_attrs %{
     title: "some title",
-    body: "some body",
-    published_at: "2025-05-26T18:25:00.000000Z"
+    body: "some body"
   }
   @update_attrs %{
     title: "some updated title",
-    body: "some updated body",
-    published_at: "2025-05-27T18:25:00.000000Z"
+    body: "some updated body"
   }
-  @invalid_attrs %{title: nil, body: nil, published_at: nil}
+  @invalid_attrs %{title: nil, body: nil}
 
   setup :register_and_log_in_user
 
