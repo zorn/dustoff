@@ -3,7 +3,7 @@ defmodule DustoffWeb.ArticleLive.Index do
 
   alias Dustoff.Articles
 
-  @impl true
+  @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
@@ -43,7 +43,7 @@ defmodule DustoffWeb.ArticleLive.Index do
     """
   end
 
-  @impl true
+  @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     if connected?(socket) do
       Articles.subscribe_articles(socket.assigns.current_scope)
@@ -55,7 +55,7 @@ defmodule DustoffWeb.ArticleLive.Index do
      |> stream(:articles, Articles.list_articles(socket.assigns.current_scope))}
   end
 
-  @impl true
+  @impl Phoenix.LiveView
   def handle_event("delete", %{"id" => id}, socket) do
     article = Articles.get_article!(socket.assigns.current_scope, id)
     {:ok, _} = Articles.delete_article(socket.assigns.current_scope, article)
@@ -63,7 +63,7 @@ defmodule DustoffWeb.ArticleLive.Index do
     {:noreply, stream_delete(socket, :articles, article)}
   end
 
-  @impl true
+  @impl Phoenix.LiveView
   def handle_info({type, %Dustoff.Articles.Article{}}, socket)
       when type in [:created, :updated, :deleted] do
     {:noreply,

@@ -3,7 +3,7 @@ defmodule DustoffWeb.ArticleLive.Show do
 
   alias Dustoff.Articles
 
-  @impl true
+  @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
@@ -29,7 +29,7 @@ defmodule DustoffWeb.ArticleLive.Show do
     """
   end
 
-  @impl true
+  @impl Phoenix.LiveView
   def mount(%{"id" => id}, _session, socket) do
     if connected?(socket) do
       Articles.subscribe_articles(socket.assigns.current_scope)
@@ -41,7 +41,7 @@ defmodule DustoffWeb.ArticleLive.Show do
      |> assign(:article, Articles.get_article!(socket.assigns.current_scope, id))}
   end
 
-  @impl true
+  @impl Phoenix.LiveView
   def handle_info(
         {:updated, %Dustoff.Articles.Article{id: id} = article},
         %{assigns: %{article: %{id: id}}} = socket

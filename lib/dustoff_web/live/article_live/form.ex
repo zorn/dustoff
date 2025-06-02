@@ -4,7 +4,7 @@ defmodule DustoffWeb.ArticleLive.Form do
   alias Dustoff.Articles
   alias Dustoff.Articles.Article
 
-  @impl true
+  @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
@@ -26,7 +26,7 @@ defmodule DustoffWeb.ArticleLive.Form do
     """
   end
 
-  @impl true
+  @impl Phoenix.LiveView
   def mount(params, _session, socket) do
     {:ok,
      socket
@@ -55,7 +55,7 @@ defmodule DustoffWeb.ArticleLive.Form do
     |> assign(:form, to_form(Articles.change_article(socket.assigns.current_scope, article)))
   end
 
-  @impl true
+  @impl Phoenix.LiveView
   def handle_event("validate", %{"article" => article_params}, socket) do
     changeset =
       Articles.change_article(
