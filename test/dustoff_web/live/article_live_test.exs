@@ -1,5 +1,5 @@
 defmodule DustoffWeb.ArticleLiveTest do
-  use DustoffWeb.ConnCase
+  use DustoffWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
   import Dustoff.ArticlesFixtures

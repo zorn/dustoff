@@ -1,5 +1,5 @@
 defmodule Dustoff.ArticlesTest do
-  use Dustoff.DataCase
+  use Dustoff.DataCase, async: true
 
   alias Dustoff.Articles
 
