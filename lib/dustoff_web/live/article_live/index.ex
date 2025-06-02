@@ -23,7 +23,16 @@ defmodule DustoffWeb.ArticleLive.Index do
       >
         <:col :let={{_id, article}} label="Title">{article.title}</:col>
         <:col :let={{_id, article}} label="Body">{article.body}</:col>
-        <:col :let={{_id, article}} label="Published at">{article.published_at}</:col>
+        <:col :let={{_id, article}} label="Published at">
+          <%= if article.published_at do %>
+            <% iso8601_value = DateTime.to_iso8601(article.published_at) %>
+            <time data-local-datetime datetime={iso8601_value}>
+              {iso8601_value}
+            </time>
+          <% else %>
+            Not Published
+          <% end %>
+        </:col>
         <:action :let={{_id, article}}>
           <div class="sr-only">
             <.link navigate={~p"/articles/#{article}"}>Show</.link>
