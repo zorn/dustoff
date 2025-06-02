@@ -16,13 +16,8 @@ defmodule DustoffWeb.ArticleLive.Index do
         </:actions>
       </.header>
 
-      <.table
-        id="articles"
-        rows={@streams.articles}
-        row_click={fn {_id, article} -> JS.navigate(~p"/articles/#{article}") end}
-      >
+      <.table id="articles" rows={@streams.articles}>
         <:col :let={{_id, article}} label="Title">{article.title}</:col>
-        <:col :let={{_id, article}} label="Body">{article.body}</:col>
         <:col :let={{_id, article}} label="Published at">
           <%= if article.published_at do %>
             <.local_datetime datetime={article.published_at} />
@@ -31,9 +26,7 @@ defmodule DustoffWeb.ArticleLive.Index do
           <% end %>
         </:col>
         <:action :let={{_id, article}}>
-          <div class="sr-only">
-            <.link navigate={~p"/articles/#{article}"}>Show</.link>
-          </div>
+          <.link navigate={~p"/articles/#{article}"}>Show</.link>
           <.link navigate={~p"/articles/#{article}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, article}}>
