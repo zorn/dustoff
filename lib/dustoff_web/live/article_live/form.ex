@@ -16,7 +16,6 @@ defmodule DustoffWeb.ArticleLive.Form do
       <.form for={@form} id="article-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:title]} type="text" label="Title" />
         <.input field={@form[:body]} type="textarea" label="Body" />
-        <.input field={@form[:published_at]} type="text" label="Published at" />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Article</.button>
           <.button navigate={return_path(@current_scope, @return_to, @article)}>Cancel</.button>
