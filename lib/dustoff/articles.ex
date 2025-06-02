@@ -149,6 +149,32 @@ defmodule Dustoff.Articles do
   end
 
   @doc """
+  Unpublishes an article.
+  """
+  @spec unpublish_article(
+          scope :: Scope.t(),
+          article :: Article.t()
+        ) :: {:ok, Article.t()} | {:error, Article.changeset()}
+  def unpublish_article(
+        %Scope{} = scope,
+        %Article{published_at: published_at} = article
+      )
+      when not is_nil(published_at) do
+    # We are using the `not is_nil(published_at)` guard to ensure that we don't
+    # respond with success if a call site attempts to unpublish an article that
+    # was never published. We'd rather raise an error to nudge the call site to
+    # avoid asking us to execute an invalid command.
+    true = article.user_id == scope.user.id
+
+    changeset = Ecto.Changeset.cast(article, %{published_at: nil}, [:published_at])
+
+    with {:ok, article = %Article{}} <- Repo.update(changeset) do
+      broadcast(scope, {:updated, article})
+      {:ok, article}
+    end
+  end
+
+  @doc """
   Deletes a article.
 
   ## Examples

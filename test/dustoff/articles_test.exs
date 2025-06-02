@@ -123,4 +123,26 @@ defmodule Dustoff.ArticlesTest do
       assert_raise MatchError, fn -> Articles.publish_article(scope, article) end
     end
   end
+
+  describe "unpublish_article/2" do
+    test "marks an article as unpublished" do
+      scope = user_scope_fixture()
+      published_article = article_fixture(scope, published_at: DateTime.utc_now())
+      assert {:ok, %Article{} = article} = Articles.unpublish_article(scope, published_article)
+      assert article.published_at == nil
+    end
+
+    test "raises if the article is not owned by the scope" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      published_article = article_fixture(other_scope, published_at: DateTime.utc_now())
+      assert_raise MatchError, fn -> Articles.unpublish_article(scope, published_article) end
+    end
+
+    test "raises if the article is not published" do
+      scope = user_scope_fixture()
+      article = article_fixture(scope, published_at: nil)
+      assert_raise FunctionClauseError, fn -> Articles.unpublish_article(scope, article) end
+    end
+  end
 end
