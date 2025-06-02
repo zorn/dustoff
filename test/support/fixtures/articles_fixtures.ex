@@ -6,6 +6,9 @@ defmodule Dustoff.ArticlesFixtures do
 
   @doc """
   Generate a article.
+
+  If the `published_at` attribute is provided, the article will be published.
+  Otherwise, the article will be unpublished.
   """
   @spec article_fixture(Dustoff.Accounts.Scope.t(), attrs :: map()) ::
           Dustoff.Articles.Article.t()
@@ -13,11 +16,22 @@ defmodule Dustoff.ArticlesFixtures do
     attrs =
       Enum.into(attrs, %{
         body: "some body",
-        published_at: ~U[2025-05-26 18:25:00.000000Z],
         title: "some title"
       })
 
-    {:ok, article} = Dustoff.Articles.create_article(scope, attrs)
-    article
+    {:ok, unpublished_article} = Dustoff.Articles.create_article(scope, attrs)
+
+    if attrs[:published_at] do
+      {:ok, published_article} =
+        Dustoff.Articles.publish_article(
+          scope,
+          unpublished_article,
+          attrs[:published_at]
+        )
+
+      published_article
+    else
+      unpublished_article
+    end
   end
 end
