@@ -143,7 +143,7 @@ defmodule Dustoff.Articles do
     changeset = Ecto.Changeset.cast(article, %{published_at: published_at}, [:published_at])
 
     with {:ok, article = %Article{}} <- Repo.update(changeset) do
-      broadcast(scope, {:published, article})
+      broadcast(scope, {:updated, article})
       {:ok, article}
     end
   end
