@@ -1,14 +1,13 @@
 defmodule Dustoff.ArticlesTest do
   use Dustoff.DataCase, async: true
 
+  import Dustoff.AccountsFixtures, only: [user_scope_fixture: 0]
+  import Dustoff.ArticlesFixtures
+
   alias Dustoff.Articles
+  alias Dustoff.Articles.Article
 
   describe "articles" do
-    alias Dustoff.Articles.Article
-
-    import Dustoff.AccountsFixtures, only: [user_scope_fixture: 0]
-    import Dustoff.ArticlesFixtures
-
     @invalid_attrs %{title: nil, body: nil, published_at: nil}
 
     test "list_articles/1 returns all scoped articles" do
@@ -100,6 +99,32 @@ defmodule Dustoff.ArticlesTest do
       scope = user_scope_fixture()
       article = article_fixture(scope)
       assert %Ecto.Changeset{} = Articles.change_article(scope, article)
+    end
+  end
+
+  describe "publish_article/3" do
+    test "marks an article as published with a given `published_at` value" do
+      published_at = DateTime.utc_now()
+      scope = user_scope_fixture()
+      article = article_fixture(scope, published_at: nil)
+      assert {:ok, %Article{} = article} = Articles.publish_article(scope, article, published_at)
+      assert article.published_at == published_at
+    end
+
+    test "marks an article as published with the current time if no `published_at` value is provided" do
+      now = DateTime.utc_now()
+      scope = user_scope_fixture()
+      article = article_fixture(scope, published_at: nil)
+      assert {:ok, %Article{} = article} = Articles.publish_article(scope, article)
+      assert article.published_at != nil
+      assert DateTime.before?(now, article.published_at)
+    end
+
+    test "raises if the article is not owned by the scope" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      article = article_fixture(other_scope)
+      assert_raise MatchError, fn -> Articles.publish_article(scope, article) end
     end
   end
 end

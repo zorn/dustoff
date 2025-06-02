@@ -120,6 +120,35 @@ defmodule Dustoff.Articles do
   end
 
   @doc """
+  Publishes an article.
+
+  Call sites can pass in the wanted `published_at` value or the function will
+  use `DateTime.utc_now()`.
+  """
+  @spec publish_article(
+          scope :: Scope.t(),
+          article :: Article.t(),
+          published_at :: DateTime.t() | nil
+        ) ::
+          {:ok, Article.t()} | {:error, Article.changeset()}
+  def publish_article(
+        %Scope{} = scope,
+        %Article{} = article,
+        published_at \\ nil
+      ) do
+    true = article.user_id == scope.user.id
+
+    published_at = published_at || DateTime.utc_now()
+
+    changeset = Ecto.Changeset.cast(article, %{published_at: published_at}, [:published_at])
+
+    with {:ok, article = %Article{}} <- Repo.update(changeset) do
+      broadcast(scope, {:published, article})
+      {:ok, article}
+    end
+  end
+
+  @doc """
   Deletes a article.
 
   ## Examples
