@@ -230,7 +230,7 @@ defmodule DustoffWeb.UserAuthTest do
         |> UserAuth.redirect_if_user_is_authenticated([])
 
       assert conn.halted
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/users/settings"
     end
 
     test "does not redirect if user is not authenticated", %{conn: conn} do
