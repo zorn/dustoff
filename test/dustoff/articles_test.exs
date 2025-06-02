@@ -30,8 +30,7 @@ defmodule Dustoff.ArticlesTest do
     test "create_article/2 with valid data creates a article" do
       valid_attrs = %{
         title: "some title",
-        body: "some body",
-        published_at: ~U[2025-05-26 18:25:00.000000Z]
+        body: "some body"
       }
 
       scope = user_scope_fixture()
@@ -39,7 +38,6 @@ defmodule Dustoff.ArticlesTest do
       assert {:ok, %Article{} = article} = Articles.create_article(scope, valid_attrs)
       assert article.title == "some title"
       assert article.body == "some body"
-      assert article.published_at == ~U[2025-05-26 18:25:00.000000Z]
       assert article.user_id == scope.user.id
     end
 
@@ -54,14 +52,12 @@ defmodule Dustoff.ArticlesTest do
 
       update_attrs = %{
         title: "some updated title",
-        body: "some updated body",
-        published_at: ~U[2025-05-27 18:25:00.000000Z]
+        body: "some updated body"
       }
 
       assert {:ok, %Article{} = article} = Articles.update_article(scope, article, update_attrs)
       assert article.title == "some updated title"
       assert article.body == "some updated body"
-      assert article.published_at == ~U[2025-05-27 18:25:00.000000Z]
     end
 
     test "update_article/3 with invalid scope raises" do
