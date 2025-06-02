@@ -477,4 +477,33 @@ defmodule DustoffWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  @doc """
+  Renders a `<time>` element for a `DateTime` value.
+
+  The raw ISO string-value will be attached inside the `<time>` and then
+  frontend JavaScript will convert it a more friendly string-value in the user's
+  timezone.
+
+  Future-enhancement idea: Allow the passing in of a format string here so we
+  can honor the requested design of the string-value even for the fallback
+  string-value.
+
+  ## Example
+      <.local_datetime datetime={~U[2025-05-27 08:00:00Z]} />
+  """
+  attr :datetime, DateTime, required: true
+
+  attr :rest, :global, doc: "Any additional HTML attributes."
+
+  def local_datetime(%{datetime: %DateTime{} = dt} = assigns) do
+    iso8601 = DateTime.to_iso8601(dt)
+    assigns = assign(assigns, :iso8601, iso8601)
+
+    ~H"""
+    <time data-local-datetime datetime={@iso8601} {@rest}>
+      {@iso8601}
+    </time>
+    """
+  end
 end

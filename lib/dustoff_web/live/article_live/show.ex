@@ -23,7 +23,13 @@ defmodule DustoffWeb.ArticleLive.Show do
       <.list>
         <:item title="Title">{@article.title}</:item>
         <:item title="Body">{@article.body}</:item>
-        <:item title="Published at">{@article.published_at}</:item>
+        <:item title="Published at">
+          <%= if @article.published_at do %>
+            <.local_datetime datetime={@article.published_at} />
+          <% else %>
+            Not Published
+          <% end %>
+        </:item>
       </.list>
     </Layouts.app>
     """

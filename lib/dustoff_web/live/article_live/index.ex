@@ -25,10 +25,7 @@ defmodule DustoffWeb.ArticleLive.Index do
         <:col :let={{_id, article}} label="Body">{article.body}</:col>
         <:col :let={{_id, article}} label="Published at">
           <%= if article.published_at do %>
-            <% iso8601_value = DateTime.to_iso8601(article.published_at) %>
-            <time data-local-datetime datetime={iso8601_value}>
-              {iso8601_value}
-            </time>
+            <.local_datetime datetime={article.published_at} />
           <% else %>
             Not Published
           <% end %>
