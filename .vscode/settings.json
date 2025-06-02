@@ -15,6 +15,7 @@
         "minlength",
         "Rebar",
         "sobelow",
+        "tidewave",
         "timestamptz",
         "typespecs",
         "Uncategorized",
