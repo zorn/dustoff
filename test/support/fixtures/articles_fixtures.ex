@@ -7,6 +7,8 @@ defmodule Dustoff.ArticlesFixtures do
   @doc """
   Generate a article.
   """
+  @spec article_fixture(Dustoff.Accounts.Scope.t(), attrs :: map()) ::
+          Dustoff.Articles.Article.t()
   def article_fixture(scope, attrs \\ %{}) do
     attrs =
       Enum.into(attrs, %{

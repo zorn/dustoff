@@ -11,6 +11,7 @@ defmodule DustoffWeb.UserAuth do
   alias Dustoff.Accounts
   alias Dustoff.Accounts.Scope
   alias Dustoff.Accounts.User
+  alias Phoenix.LiveView.Socket
 
   # Make the remember me cookie valid for 14 days. This should match
   # the session validity setting in UserToken.
@@ -236,6 +237,12 @@ defmodule DustoffWeb.UserAuth do
         live "/profile", ProfileLive, :index
       end
   """
+  @spec on_mount(
+          name :: atom(),
+          params :: any(),
+          session :: map(),
+          socket :: Socket.t()
+        ) :: {:cont, Socket.t()} | {:halt, Socket.t()}
   def on_mount(:mount_current_scope, _params, session, socket) do
     {:cont, mount_current_scope(socket, session)}
   end
@@ -281,9 +288,10 @@ defmodule DustoffWeb.UserAuth do
     end)
   end
 
-  @doc "Returns the path to redirect to after log in."
-  # the user was already logged in, redirect to settings
+  @doc "The path to redirect the user to after log in."
+  @spec signed_in_path(Plug.Conn.t()) :: String.t()
   def signed_in_path(%Plug.Conn{assigns: %{current_scope: %Scope{user: %Accounts.User{}}}}) do
+    # The user was already logged in, redirect to settings.
     ~p"/users/settings"
   end
 

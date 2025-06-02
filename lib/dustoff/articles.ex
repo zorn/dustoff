@@ -3,11 +3,11 @@ defmodule Dustoff.Articles do
   The Articles context.
   """
 
-  import Ecto.Query, warn: false
-  alias Dustoff.Repo
+  import Ecto.Query
 
-  alias Dustoff.Articles.Article
   alias Dustoff.Accounts.Scope
+  alias Dustoff.Articles.Article
+  alias Dustoff.Repo
 
   @doc """
   Subscribes to scoped notifications about any article changes.
@@ -19,10 +19,11 @@ defmodule Dustoff.Articles do
     * {:deleted, %Article{}}
 
   """
+  @spec subscribe_articles(scope :: Scope.t()) :: :ok
   def subscribe_articles(%Scope{} = scope) do
     key = scope.user.id
 
-    Phoenix.PubSub.subscribe(Dustoff.PubSub, "user:#{key}:articles")
+    :ok = Phoenix.PubSub.subscribe(Dustoff.PubSub, "user:#{key}:articles")
   end
 
   defp broadcast(%Scope{} = scope, message) do
@@ -40,6 +41,7 @@ defmodule Dustoff.Articles do
       [%Article{}, ...]
 
   """
+  @spec list_articles(scope :: Scope.t()) :: [Article.t()]
   def list_articles(%Scope{} = scope) do
     Repo.all(from article in Article, where: article.user_id == ^scope.user.id)
   end
@@ -58,6 +60,7 @@ defmodule Dustoff.Articles do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_article!(scope :: Scope.t(), Article.id()) :: Article.t()
   def get_article!(%Scope{} = scope, id) do
     Repo.get_by!(Article, id: id, user_id: scope.user.id)
   end
@@ -74,6 +77,8 @@ defmodule Dustoff.Articles do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec create_article(scope :: Scope.t(), attrs :: map()) ::
+          {:ok, Article.t()} | {:error, Ecto.Changeset.t()}
   def create_article(%Scope{} = scope, attrs) do
     with {:ok, article = %Article{}} <-
            %Article{}
@@ -96,7 +101,13 @@ defmodule Dustoff.Articles do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_article(
+          scope :: Scope.t(),
+          article :: Article.t(),
+          attrs :: map()
+        ) :: {:ok, Article.t()} | {:error, Article.changeset()}
   def update_article(%Scope{} = scope, %Article{} = article, attrs) do
+    # TODO: I don't think `MatchError` is the right runtime experience here.
     true = article.user_id == scope.user.id
 
     with {:ok, article = %Article{}} <-
@@ -120,6 +131,10 @@ defmodule Dustoff.Articles do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec delete_article(
+          scope :: Scope.t(),
+          article :: Article.t()
+        ) :: {:ok, Article.t()} | {:error, Article.changeset()}
   def delete_article(%Scope{} = scope, %Article{} = article) do
     true = article.user_id == scope.user.id
 
@@ -139,6 +154,11 @@ defmodule Dustoff.Articles do
       %Ecto.Changeset{data: %Article{}}
 
   """
+  @spec change_article(
+          scope :: Scope.t(),
+          article :: Article.t(),
+          attrs :: map()
+        ) :: Article.changeset()
   def change_article(%Scope{} = scope, %Article{} = article, attrs \\ %{}) do
     true = article.user_id == scope.user.id
 
