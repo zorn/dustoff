@@ -107,7 +107,8 @@ defmodule Dustoff.Articles do
           attrs :: map()
         ) :: {:ok, Article.t()} | {:error, Article.changeset()}
   def update_article(%Scope{} = scope, %Article{} = article, attrs) do
-    # TODO: I don't think `MatchError` is the right runtime experience here.
+    # FIXME: I don't think `MatchError` is the right runtime experience here.
+    # https://github.com/zorn/dustoff/issues/15
     true = article.author_id == scope.user.id
 
     with {:ok, article = %Article{}} <-
