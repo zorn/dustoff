@@ -4,6 +4,7 @@ defmodule Dustoff.ArticlesTest do
   import Dustoff.AccountsFixtures, only: [user_scope_fixture: 0]
   import Dustoff.ArticlesFixtures
 
+  alias Dustoff.Accounts.Scope
   alias Dustoff.Articles
   alias Dustoff.Articles.Article
 
@@ -44,6 +45,19 @@ defmodule Dustoff.ArticlesTest do
     test "create_article/2 with invalid data returns error changeset" do
       scope = user_scope_fixture()
       assert {:error, %Ecto.Changeset{}} = Articles.create_article(scope, @invalid_attrs)
+    end
+
+    test "create_article/2 with invalid scope raises" do
+      valid_attrs = %{
+        title: "some title",
+        body: "some body"
+      }
+
+      # FIXME: `KeyError` is not the right runtime experience here. Overall I
+      # feel like we don't have a good API story for scopes.
+      assert_raise KeyError, fn ->
+        Articles.create_article(%Scope{user: nil}, valid_attrs)
+      end
     end
 
     test "update_article/3 with valid data updates the article" do
