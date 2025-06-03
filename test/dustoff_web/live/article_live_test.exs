@@ -127,5 +127,23 @@ defmodule DustoffWeb.ArticleLiveTest do
       assert html =~ "Article updated successfully"
       assert html =~ "some updated title"
     end
+
+    test "unpublishes a published article from the show page", %{conn: conn, scope: scope} do
+      published_at = DateTime.utc_now()
+      article = Dustoff.ArticlesFixtures.article_fixture(scope, %{published_at: published_at})
+
+      {:ok, show_live, html} = live(conn, ~p"/articles/#{article}")
+      assert html =~ "Unpublish Article"
+      assert html =~ "Published at"
+
+      show_live
+      |> element("button", "Unpublish Article")
+      |> render_click()
+
+      # After unpublishing, the button should be gone and 'Not Published' should appear
+      html = render(show_live)
+      refute html =~ "Unpublish Article"
+      assert html =~ "Not Published"
+    end
   end
 end

@@ -26,6 +26,9 @@ defmodule DustoffWeb.ArticleLive.Show do
         <:item title="Published at">
           <%= if @article.published_at do %>
             <.local_datetime datetime={@article.published_at} />
+            <.button phx-click="unpublish" variant="primary">
+              Unpublish Article
+            </.button>
           <% else %>
             Not Published
             <%!-- I'd like this button to be smaller or better laid out on
@@ -83,6 +86,16 @@ defmodule DustoffWeb.ArticleLive.Show do
 
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Failed to publish article.")}
+    end
+  end
+
+  def handle_event("unpublish", _params, socket) do
+    case Articles.unpublish_article(socket.assigns.current_scope, socket.assigns.article) do
+      {:ok, article} ->
+        {:noreply, assign(socket, :article, article)}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to unpublish article.")}
     end
   end
 end
