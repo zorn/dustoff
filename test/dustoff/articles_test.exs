@@ -156,7 +156,7 @@ defmodule Dustoff.ArticlesTest do
     test "raises if the article is not published" do
       scope = user_scope_fixture()
       article = article_fixture(scope, published_at: nil)
-      assert_raise FunctionClauseError, fn -> Articles.unpublish_article(scope, article) end
+      assert_raise RuntimeError, fn -> Articles.unpublish_article(scope, article) end
     end
   end
 end
