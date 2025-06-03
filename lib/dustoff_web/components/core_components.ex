@@ -493,16 +493,13 @@ defmodule DustoffWeb.CoreComponents do
       <.local_datetime datetime={~U[2025-05-27 08:00:00Z]} />
   """
   attr :datetime, DateTime, required: true
+  attr :rest, :global, doc: "Any additional HTML attributes to be added to the <time> element."
 
-  attr :rest, :global, doc: "Any additional HTML attributes."
-
-  def local_datetime(%{datetime: %DateTime{} = dt} = assigns) do
-    iso8601 = DateTime.to_iso8601(dt)
-    assigns = assign(assigns, :iso8601, iso8601)
-
+  @spec local_datetime(assigns :: map()) :: Rendered.t()
+  def local_datetime(assigns) do
     ~H"""
-    <time data-local-datetime datetime={@iso8601} {@rest}>
-      {@iso8601}
+    <time data-local-datetime datetime={DateTime.to_iso8601(@datetime)} {@rest}>
+      {DateTime.to_iso8601(@datetime)}
     </time>
     """
   end
