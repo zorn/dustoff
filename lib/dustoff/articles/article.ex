@@ -67,8 +67,10 @@ defmodule Dustoff.Articles.Article do
   def changeset(article, attrs, user_scope) do
     article
     |> cast(attrs, [:title, :body])
-    # TODO: Make sure we are validating the required author_id.
     |> validate_required([:title, :body])
+    # FIXME: This is a frail assumption, that the call side scope context is
+    # always the author of the article. If we had admins allowed to edit
+    # articles of other people we would not want to inject them as the author.
     |> put_change(:author_id, user_scope.user.id)
   end
 end
