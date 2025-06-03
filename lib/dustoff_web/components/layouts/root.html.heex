@@ -10,11 +10,14 @@
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
-    <%!-- The default Phoenix template will include this inline script to help
-    power the dark/light mode toggle on the default home page. Inline scripts
-    are not allowed in the content security policy currently, and rather than
-    add it I will comment out the script for now. --%>
-    <%!-- <script>
+
+    <%!-- The following inline script is used to power the light/dark mode
+    toggle. In my experience it has to be inline to avoid a flash of unstyled
+    content issue. The contents of this script are sensitive and if you change
+    the contents of this script you will need to update the content security
+    policy `sha256-` hash in `lib/dustoff_web/router.ex` based on its contents.
+    See https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP for more info. --%>
+    <script>
       (() => {
         const setTheme = (theme) => {
           if (theme === "system") {
@@ -31,29 +34,9 @@
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
         window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
       })();
-    </script> --%>
+    </script>
   </head>
   <body>
-    <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
-      <%= if @current_scope do %>
-        <li>
-          {@current_scope.user.email}
-        </li>
-        <li>
-          <.link href={~p"/users/settings"}>Settings</.link>
-        </li>
-        <li>
-          <.link href={~p"/users/log-out"} method="delete">Log out</.link>
-        </li>
-      <% else %>
-        <li>
-          <.link href={~p"/users/register"}>Register</.link>
-        </li>
-        <li>
-          <.link href={~p"/users/log-in"}>Log in</.link>
-        </li>
-      <% end %>
-    </ul>
     {@inner_content}
   </body>
 </html>

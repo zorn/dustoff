@@ -14,7 +14,8 @@ defmodule DustoffWeb.Router do
     # so we need to allow them with `img-src`.
     # https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
     plug :put_secure_browser_headers, %{
-      "content-security-policy" => "default-src 'self'; img-src 'self' data:"
+      "content-security-policy" =>
+        "default-src 'self'; img-src 'self' data:; script-src 'self' 'sha256-FChCV07pq1+qZclQt6vd9cHIb8pbHMGK8feTB2U+dW4='"
     }
 
     plug :fetch_current_scope_for_user
@@ -67,6 +68,18 @@ defmodule DustoffWeb.Router do
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm-email/:token", UserSettingsController, :confirm_email
+  end
+
+  scope "/", DustoffWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{DustoffWeb.UserAuth, :require_authenticated}] do
+      live "/articles", ArticleLive.Index, :index
+      live "/articles/new", ArticleLive.Form, :new
+      live "/articles/:id", ArticleLive.Show, :show
+      live "/articles/:id/edit", ArticleLive.Form, :edit
+    end
   end
 
   scope "/", DustoffWeb do

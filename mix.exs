@@ -36,6 +36,9 @@ defmodule Dustoff.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # For Robot overload help.
+      {:tidewave, "~> 0.1", only: :dev},
+
       # For TDD.
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
 

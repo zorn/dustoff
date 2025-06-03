@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "citext",
+        "Datetimes",
         "Dustoff",
         "ecto",
         "erlef",
@@ -15,6 +16,7 @@
         "minlength",
         "Rebar",
         "sobelow",
+        "tidewave",
         "timestamptz",
         "typespecs",
         "Uncategorized",

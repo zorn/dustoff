@@ -79,3 +79,61 @@ if (process.env.NODE_ENV === "development") {
   })
 }
 
+/**
+ * @function renderLocalDatetimes
+ * @description
+ *   Finds all <time> elements with the attribute 'data-local-datetime' and
+ *   replaces their text content with a formatted date string in the user's
+ *   local time zone.
+ *
+ *   The function expects each <time> element to have a 'datetime' attribute
+ *   containing an ISO8601 UTC datetime string. The displayed format will be:
+ *   'Month D, YYYY h:mm AM/PM TZ', e.g., 'May 5, 2025 4:00 PM EDT'. If
+ *   JavaScript is disabled, no substitution will be made. You should default
+ *   with a UTC fallback string value
+ *
+ * @example
+ *   // In your HTML/HEEx:
+ *   // <time data-local-datetime datetime="2025-05-27T08:00:00.000000Z">
+ *   //     2025-05-27T08:00:00.000000Z
+ *   // </time>
+ *
+ *   // In your JS:
+ *   // renderLocalDatetimes();
+ *
+ *   // The updated DOM will be:
+ *   // <time data-local-datetime datetime="2025-05-27T08:00:00.000000Z">
+ *   //     May 27, 2025 4:00 PM EDT
+ *   // </time>
+ *
+ * @returns {void}
+ */
+function renderLocalDatetimes() {
+  // If this `app.js` file starts to get large, we should move this to a separate
+  // file. This is currently not tested as we do not have JavaScript test
+  // infrastructure. Be careful when adding new functionality.
+  document.querySelectorAll("[data-local-datetime]").forEach((el) => {
+    // Get the ISO8601 UTC datetime string from the datetime attribute
+    const iso = el.getAttribute("datetime");
+    if (!iso) return;
+    // Parse the string into a JavaScript Date object
+    const dt = new Date(iso);
+    if (isNaN(dt)) return;
+    // Format: May 5, 2025 4:00 PM EDT
+    const opts = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZoneName: "short",
+    };
+    let str = dt.toLocaleString(undefined, opts);
+    el.textContent = str;
+  });
+}
+
+// Render local datetimes when the page loads and when the page is updated.
+document.addEventListener("DOMContentLoaded", renderLocalDatetimes);
+document.addEventListener("phx:update", renderLocalDatetimes);
