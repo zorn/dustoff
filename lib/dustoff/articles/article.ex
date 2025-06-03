@@ -8,7 +8,7 @@ defmodule Dustoff.Articles.Article do
   * `:title` - The title of the article.
   * `:body` - The body of the article.
   * `:published_at` - The date and time the article was published.
-  * `:user_id` - The identity of the user who created the article.
+  * `:author_id` - The identity of the user who created the article.
   """
 
   use Ecto.Schema
@@ -16,6 +16,7 @@ defmodule Dustoff.Articles.Article do
   import Ecto.Changeset
 
   alias Dustoff.Accounts.Scope
+  alias Dustoff.Accounts.User
 
   @typedoc """
   A repo-sourced `Dustoff.Articles.Article` entity.
@@ -25,7 +26,7 @@ defmodule Dustoff.Articles.Article do
           title: String.t(),
           body: String.t(),
           published_at: DateTime.t() | nil,
-          user_id: id()
+          author_id: User.id()
         }
 
   @typedoc """
@@ -52,7 +53,7 @@ defmodule Dustoff.Articles.Article do
     field :title, :string
     field :body, :string
     field :published_at, :utc_datetime_usec
-    field :user_id, :binary_id
+    field :author_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -66,8 +67,8 @@ defmodule Dustoff.Articles.Article do
   def changeset(article, attrs, user_scope) do
     article
     |> cast(attrs, [:title, :body])
-    # TODO: Make sure we are validating the required user_id.
+    # TODO: Make sure we are validating the required author_id.
     |> validate_required([:title, :body])
-    |> put_change(:user_id, user_scope.user.id)
+    |> put_change(:author_id, user_scope.user.id)
   end
 end

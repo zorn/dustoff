@@ -38,7 +38,7 @@ defmodule Dustoff.ArticlesTest do
       assert {:ok, %Article{} = article} = Articles.create_article(scope, valid_attrs)
       assert article.title == "some title"
       assert article.body == "some body"
-      assert article.user_id == scope.user.id
+      assert article.author_id == scope.user.id
     end
 
     test "create_article/2 with invalid data returns error changeset" do

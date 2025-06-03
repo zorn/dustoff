@@ -46,7 +46,7 @@ defmodule DustoffWeb.ArticleLive.Form do
   end
 
   defp apply_action(socket, :new, _params) do
-    article = %Article{user_id: socket.assigns.current_scope.user.id}
+    article = %Article{author_id: socket.assigns.current_scope.user.id}
 
     socket
     |> assign(:page_title, "New Article")

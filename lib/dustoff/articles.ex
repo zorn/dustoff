@@ -43,7 +43,7 @@ defmodule Dustoff.Articles do
   """
   @spec list_articles(scope :: Scope.t()) :: [Article.t()]
   def list_articles(%Scope{} = scope) do
-    Repo.all(from article in Article, where: article.user_id == ^scope.user.id)
+    Repo.all(from article in Article, where: article.author_id == ^scope.user.id)
   end
 
   @doc """
@@ -62,7 +62,7 @@ defmodule Dustoff.Articles do
   """
   @spec get_article!(scope :: Scope.t(), Article.id()) :: Article.t()
   def get_article!(%Scope{} = scope, id) do
-    Repo.get_by!(Article, id: id, user_id: scope.user.id)
+    Repo.get_by!(Article, id: id, author_id: scope.user.id)
   end
 
   @doc """
@@ -108,7 +108,7 @@ defmodule Dustoff.Articles do
         ) :: {:ok, Article.t()} | {:error, Article.changeset()}
   def update_article(%Scope{} = scope, %Article{} = article, attrs) do
     # TODO: I don't think `MatchError` is the right runtime experience here.
-    true = article.user_id == scope.user.id
+    true = article.author_id == scope.user.id
 
     with {:ok, article = %Article{}} <-
            article
@@ -136,7 +136,7 @@ defmodule Dustoff.Articles do
         %Article{} = article,
         published_at \\ nil
       ) do
-    true = article.user_id == scope.user.id
+    true = article.author_id == scope.user.id
 
     published_at = published_at || DateTime.utc_now()
 
@@ -164,7 +164,7 @@ defmodule Dustoff.Articles do
     # respond with success if a call site attempts to unpublish an article that
     # was never published. We'd rather raise an error to nudge the call site to
     # avoid asking us to execute an invalid command.
-    true = article.user_id == scope.user.id
+    true = article.author_id == scope.user.id
 
     changeset = Ecto.Changeset.cast(article, %{published_at: nil}, [:published_at])
 
@@ -191,7 +191,7 @@ defmodule Dustoff.Articles do
           article :: Article.t()
         ) :: {:ok, Article.t()} | {:error, Article.changeset()}
   def delete_article(%Scope{} = scope, %Article{} = article) do
-    true = article.user_id == scope.user.id
+    true = article.author_id == scope.user.id
 
     with {:ok, article = %Article{}} <-
            Repo.delete(article) do
@@ -215,7 +215,7 @@ defmodule Dustoff.Articles do
           attrs :: map()
         ) :: Article.changeset()
   def change_article(%Scope{} = scope, %Article{} = article, attrs \\ %{}) do
-    true = article.user_id == scope.user.id
+    true = article.author_id == scope.user.id
 
     Article.changeset(article, attrs, scope)
   end
